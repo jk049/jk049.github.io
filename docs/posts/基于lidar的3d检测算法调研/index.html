@@ -1,0 +1,3234 @@
+<!DOCTYPE html>
+<html class="js no-touch  progressive-image  no-reduced-motion progressive" lang="en">
+  <head>
+    <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="/img/favicon.ico">
+
+    <meta name="keyword" content="">
+
+    <title>基于LiDAR的3D检测算法调研</title>
+
+    <link rel="canonical" href="/posts/%E5%9F%BA%E4%BA%8Elidar%E7%9A%843d%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95%E8%B0%83%E7%A0%94/">
+
+    <link rel="stylesheet" href="/css/global.css">
+
+    <link rel="stylesheet" href="/css/custom.css">
+
+    <link rel="stylesheet" href="/css/search.css" />
+
+    
+    
+
+    
+    
+
+</head>
+  </head>
+  <body class=" page-article   ">
+    <header>
+      <nav class="nav">
+  <div class="nav-wrapper">
+    <div class="nav-content-wrapper">
+      <div class="nav-content">
+        <a href="/ " class="nav-title">jk049&#39;s blog</a>
+        <div class="nav-menu">
+          <div class="nav-item-wrapper">
+            <a href="/posts " class="nav-item-content">Articles</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/about" class="nav-item-content">About</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/index.xml" class="nav-item-content" target="_blank">RSS</a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleSearchModal(){
+    const template = `
+    <div class="modal-body">
+      <div id="autocomplete" onclick="event.stopPropagation();"></div>
+    </div>
+    `
+    const modal = document.querySelector("#modal-wrapper")
+    if(!modal){
+      const div = document.createElement("div")
+      document.body.setAttribute("style","overflow: hidden;")
+      div.setAttribute("id", "modal-wrapper")
+      div.setAttribute("onclick", "toggleSearchModal()")
+      div.innerHTML = template
+      const script = document.createElement("script");script.setAttribute("src", "https://jk049.github.io/js/algolia.js")
+      div.appendChild(script)
+      document.body.append(div)
+    } else {
+      document.body.removeAttribute("style")
+      document.body.removeChild(modal)
+    }
+  }
+</script>
+    </header>
+    
+  
+  
+  <main id="main" class="main">
+      <section>
+        <article class="article">
+          
+          <div class=" article-header ">
+            <div class="category component">
+              <div class="component-content">
+                <div class="category-eyebrow">
+                  <span class="category-eyebrow__category category_original">
+                    
+                      
+                        Lidar
+                      
+                    
+                  </span>
+                  <span class="category-eyebrow__date">December 27, 2022</span>
+                </div>
+              </div>
+            </div>
+            <div class="pagetitle component">
+              <div class="component-content">
+                <h1 class="hero-headline">基于LiDAR的3D检测算法调研</h1>
+              </div>
+            </div>
+            <div class="component  article-subhead ">
+              <div class="component-content">盘点2017年以来的典型3D检测算法</div>
+            </div>
+
+            <div class="tagssheet component">
+              <div class="component-content">
+                
+                  
+                  <a href="/tags/lidar" class="tag">
+                    Lidar
+                  </a>
+                
+                  
+                  <a href="/tags/3d" class="tag">
+                    3D
+                  </a>
+                
+              </div>
+            </div>
+          </div>
+          
+          <div class="pagebody">
+            
+            
+            
+            
+            
+            
+            
+            
+            
+<div class="component-content pagebody component">
+  <h1 id="总体介绍" class="pagebody-header">
+    总体介绍
+  </h1>
+</div><p class="component-content component">自动驾驶技术已经广泛应用与自动驾驶卡车、机器人出租车、送货机器人等领域，而自动驾驶技术最核心的功能模块就是感知系统。感知系统的输入通常是多模数据，包括来自camera的图像、来自LiDAR的点云、以及高精度地图等数据；感知系统的输出是路上关键元素的语义信息和几何信息。高精度的感知结果是下一步轨迹预测及路径规划的保障，因此3D目标检测是感知系统最重要的任务之一。</p>
+<p class="component-content component">3D目标检测的目的包括：</p>
+<div class="component-content component"><ul>
+<li>预测目标的位置；</li>
+<li>预测目标的尺寸；</li>
+<li>关键目标的分类，如行人、机动车、自行车等；</li>
+</ul></div>
+<p class="component-content component">与2D目标检测相比，3D检测更注重目标的位置和真实世界中的3D坐标。通过3D检测结果的几何信息，可以获得自动驾驶车辆与感知目标的距离等关键信息。</p>
+<p class="component-content component">本文介绍基于LiDAR的3D检测方法，即基于点云或range图像的3D检测方法。具体安排如下：</p>
+<div class="component-content component"><ol>
+<li>介绍基于LiDAR的3D检测典型方法，包括：
+<div class="component-content component"><ul>
+<li>基于point的检测方法；</li>
+<li>基于voxel/pillar的检测方法；</li>
+<li>基于range图像的检测方法；</li>
+<li>基于多种技术的混合方法，包括transformer/voxel/pillar等技术、点云表征方式以及各检测框架的混合；</li>
+<li>基于对输入数据增强的方法；</li>
+</ul></div>
+</li>
+<li>对基于LiDAR的3D检测算法进行分析与总结，展望下一代基于LiDAR的3D检测技术发展趋势。</li>
+</ol></div>
+<p class="component-content component">基于LiDAR的3D检测方法的里程碑如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-3608434831b3d18312b29b391f3af448" id="lht3608434831b3d18312b29b391f3af448">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230225204438920.png" alt="image-20230225204438920"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230225204438920
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">接下来，本文将介绍上图中各种典型方法的原理与架构方面的细节。</p>
+
+<div class="component-content pagebody component">
+  <h1 id="典型方法" class="pagebody-header">
+    典型方法
+  </h1>
+</div><p class="component-content component">虽然当前基于图像的深度学习模型取得很多突破性的进展和质的改善，但是无法将基于图像的深度学习方法直接应用于LiDAR数据。主要原因是图像的像素分布均匀，但是点云分布稀疏且不均匀，因此对点云的特征提取模型需要特殊设计；同时，对于LiDAR的range图像而言，虽然其数据分布稠密，但是range图像呈现的是3D信息，而不是RGB信息，因此直接在range图像上使用卷积神经网络可能不会得到好的效果。</p>
+<p class="component-content component">另一方面，自动驾驶场景的检测通常要求实时性，因此如何在满足实时性的同时满足高精度的检测要求仍是自动驾驶领域未攻克的难题。</p>
+<p class="component-content component">基于此背景，本章节将介绍基于LiDAR的3D检测典型算法。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="vote3deep" class="pagebody-header">
+    Vote3Deep
+  </h2>
+</div><p class="component-content component">该文章是牛津大学于2016年9月提出的一种基于投票机制(voite scheme)的3D检测方法，在KITTI上的car easy测试集的AP达到76.79%。2016年以前，基于LiDAR的3D检测方法大多是基于投票机制的，比如Vote3D/Voting for Voting等。</p>
+<p class="component-content component">Vote3Deep是基于投票机制的3D检测方法的最后一篇代表性文章，借鉴了许多之前的基于vote机制的3D检测算法的优点。之后的LiDAR 3D方法开始转向voxel/pillars/transformer/RCNN等技术方向，同时指标也有了大幅提升，vote机制几近没落。</p>
+<p class="component-content component">该文章的主要方法是将稀疏点云数据转换为不同可变尺度的grid，然后用CNN对3D框进行预测和回归。</p>
+<p class="component-content component">对于每个非空grid，基于统计的方法提取其特征向量，特征向量的信息包括：是否为空、反射率的均值和方差以及长宽高的均值和方差。获得特征向量后，采用类似Voting for Voting in Online Point Cloud Object Detection</p>
+<p class="component-content component">的投票机制，对特征向量进行稀疏卷积。为了避免为每个框回归具体尺寸，文章将每个类别的框都设置为固定尺寸。投票过程的示意图如下所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-bc7e7ec2b832ecf20303d1bbd8116ed8" id="lhtbc7e7ec2b832ecf20303d1bbd8116ed8">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219153018076.png" alt="image-20230219153018076"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219153018076
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">基本过程是通过卷积滤波核(convolutional filter kernel)实现，用每个gird以及其周围grid的点云状况表征该点云信息。</p>
+<p class="component-content component">测试指标如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-97c670a1c3f5dac92f37b32ea41f4afa" id="lht97c670a1c3f5dac92f37b32ea41f4afa">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219153406877.png" alt="image-20230219153406877"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219153406877
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pointnet" class="pagebody-header">
+    PointNet
+  </h2>
+</div><p class="component-content component">PointNet是Leonidas团队于2016年12月提出的一种基于LiDAR的3D处理框架，之后作者还提出了改进版本PointNet++。之所以称为3D处理框架而不是3D检测框架，是因为作者在效果验证环节，用3D目标分类数据集和语义分割数据集对框架进行效果验证，没有在当时常用的KITTI 3D检测数据集上验证。</p>
+<p class="component-content component">本文在这里介绍这篇文章主要有两方面原因：</p>
+<div class="component-content component"><ol>
+<li>PointNet是第一个可以直接处理LiDAR点云的方法，之前的方法总是需要将点云转换为其他数据形式，然后才能进行推理；</li>
+<li>就目前而言，直接处理点云的3D检测方法基本都是基于PointNet的演进，之后的很多文章都使用或借鉴了PointNet中处理点云的方法；</li>
+</ol></div>
+<p class="component-content component">PointNet的架构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-8c6704c980522d2792929bb10221e630" id="lht8c6704c980522d2792929bb10221e630">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219194343137.png" alt="image-20230219194343137"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219194343137
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">由上图可知，PointNet由一系列mlp、max pool、BN、ReLU等组成，具体分析不在这里展开。</p>
+<p class="component-content component">由于PointNet直接处理点云数据，所以内存消耗大，处理速度慢。后面基于PointNet的演进方法主要进行两方面的优化：</p>
+<div class="component-content component"><ul>
+<li>
+<p class="component-content component">改变PointNet的应用场景：将PointNet应用于部分点云而不是全部点云，比如FrustumPointNet将PointNet独立应用于每个Frustum中；</p>
+</li>
+<li>
+<p class="component-content component">提取PointNet的部分层组成独立模块：如后来的VoxelNet将PointNet中某些部分提取出来，组成VFE(Voxel Feature Encoding)模块, 而再后来的SECOND又对VFE进行了优化；</p>
+</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h2 id="voxelnet" class="pagebody-header">
+    VoxelNet
+  </h2>
+</div><p class="component-content component">VoxelNet是Oncel Tuzel团队于2017年11月提出的一种基于LiDAR的3D检测算法。该算法的主要贡献是首次将无规律的点云数据划分为规律的数据形式：将点云分割成相同大小的长方体，该长方体称为voxel。之后很多研究都沿用了这种称为voxelization的点云转换方法，比如SECOND、PV-RCNN、Voxel R-CNN、VoTr等。voxel的示意图如下所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-f1e43dac7d363c8e569617fa7fd48719" id="lhtf1e43dac7d363c8e569617fa7fd48719">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219205801444.png" alt="image-20230219205801444"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219205801444
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">文章中，每个voxel的长宽高尺寸是(0.2m, 0.2m, 0.4m)。</p>
+<p class="component-content component">VoxelNet的整体架构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-2bc5c804c1fc8c4e54e14c31b3e8e15d" id="lht2bc5c804c1fc8c4e54e14c31b3e8e15d">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219210232313.png" alt="image-20230219210232313"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219210232313
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">具体来说，VoxelNet将输入点云转换为相同大小的3D voxel，然后用VFE(voxel feature encoding)层将每个voxel内的点云转换为特征表示；最后用RPN进行3D框的检测和回归。其中，VFE的借鉴了PointNet的结构，特点也是处理速度较慢，后续工作如SECOND提出了效率更高的VFE层。</p>
+<p class="component-content component">作者没在KITTI测试集上对此方法进行验证，只在验证集上进行了验证，对car easy样本的AP指标为81.97%，详细数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-a4db1ee0f09027b83e5fda14ad060b21" id="lhta4db1ee0f09027b83e5fda14ad060b21">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219205415319.png" alt="image-20230219205415319"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219205415319
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">【注】后续的PointPillars在横向指标对比中，说VoxelNet在KITTI测试集上对car easy样本的AP为77.47%。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="second" class="pagebody-header">
+    SECOND
+  </h2>
+</div><p class="component-content component">SECOND是李博团队于2018年8月提出了针对LiDAR 3D检测任务的one stage检测方法。该方法是基于VoxelNet的演进，其核心贡献是首次引入针对点云的稀疏卷积，同时对VoxelNet的VFE层进行了速度优化。SECOND框架的特点是AP高的同时速度快，在1080Ti上每帧的推理速度为50ms，而之前的VoxelNet需要200ms。</p>
+<p class="component-content component">SECOND的整体架构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-0cacde8b5ea3bdb0ab910f2210cf9241" id="lht0cacde8b5ea3bdb0ab910f2210cf9241">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219213834010.png" alt="image-20230219213834010"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219213834010
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">可见该框架与VoxelNet的结构非常相似：voxelization之后进行VFE，然后接3D卷积层，之后RPN。不同之处在于SECOND对VFE进行了速度方面的优化，同时借鉴空间稀疏卷积(spatially sparse convolution)和submanifold convolution的思路，将VoxelNet中的传统3D卷积层换为稀疏卷积层。</p>
+<p class="component-content component">测试指标：在KITTI测试集上，对car easy样本的AP达到83.13%，详细数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-5de60c1a23dd37d3740cb5dac58eb280" id="lht5de60c1a23dd37d3740cb5dac58eb280">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219214758497.png" alt="image-20230219214758497"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219214758497
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pointpillars" class="pagebody-header">
+    PointPillars
+  </h2>
+</div><p class="component-content component">PointPillars是提出于2018年12月的一种基于LiDAR的3D检测算法。该算法的特点是非常快，在1080Ti上每帧点云的推理速度达到60-100Hz。PointPillars的核心贡献是提出另一种类似voxel的点云规则化的方法：将无规律的点云转换为规律的柱形长方体，该长方体称为pillar。pillar示意图如下所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-e9271e762504d6b3fb08157bf1ff4a52" id="lhte9271e762504d6b3fb08157bf1ff4a52">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219220115986.png" alt="image-20230219220115986"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219220115986
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">论文中，每个pillar的长和宽都是0.16m，高度为整个点云高度，对应KITTI数据集则为4m。</p>
+<p class="component-content component">PointPillars的整体架构如下图所示:</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-e5a1ba2ca0f968fe43affaf2fc47f85e" id="lhte5a1ba2ca0f968fe43affaf2fc47f85e">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219220712381.png" alt="image-20230219220712381"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219220712381
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该框架主要包含3个模块:</p>
+<div class="component-content component"><ul>
+<li>特征编码模块: 将点云pillar化后进行特征提取，然后转换为稀疏伪图像;</li>
+<li>2D卷积backbone: 对伪图像进行特征提取;</li>
+<li>检测头: 回归最后的3D框, 使用SSD作为head.</li>
+</ul></div>
+<p class="component-content component">测试指标：在KITTI测试集上，对car easy样本的AP达到79.05，不及前面的SECOND，但是在中等和困难样本上的AP比SECOND高。详细数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-8218fb26707320a0760498c2b593ae29" id="lht8218fb26707320a0760498c2b593ae29">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230219221500708.png" alt="image-20230219221500708"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230219221500708
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="ipod" class="pagebody-header">
+    IPOD
+  </h2>
+</div><p class="component-content component">IPOD是贾佳亚团队于2018年12月提出的一种3D检测算法，该算法的核心思想是从点云直接生成proposal。不同于对点云进行各种转换后的3D检测, IPOD直接基于每个点播撒proposal种子, 然后生成proposal, 然后对proposal进行特征提取, 最后生成检测框。</p>
+<p class="component-content component">IPOD的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-98712c26e480ab7fa5e002f6fc5a53bf" id="lht98712c26e480ab7fa5e002f6fc5a53bf">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220221917115.png" alt="image-20230220221917115"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220221917115
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">基本处理流程为:</p>
+<div class="component-content component"><ol>
+<li>先从图像生成目标的语义分割;</li>
+<li>将图像上的语义分割结果映射到点云中;</li>
+<li>在点云上产生proposal;</li>
+</ol></div>
+<p class="component-content component">笔者认为上述第2步，将语义分割信息映射到点云的过程会引入偏移问题，这种映射偏移问题在LC融合算法中较常见。也正是因为这种映射便宜问题难以解决，最近的LC融合算法都改向了基于Transformer的软关联方式，抛弃了早期的硬关联等映射机制。可能正是由于硬关联导致的映射偏移问题，才导致该算法在指标上不出彩吧。</p>
+<p class="component-content component">从指标上看，该算法对car easy的AP指标为79.75，远低于18年8月提出的SECOND；另一方面，作者宣称该算法对中等和困难场景的检测效果较好，但实际上，同期的PointPillars在困难场景的AP指标更高。详细数据如下所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-3b1b6fed413feaeded605138de09e17a" id="lht3b1b6fed413feaeded605138de09e17a">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220222242442.png" alt="image-20230220222242442"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220222242442
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pointrcnn" class="pagebody-header">
+    PointRCNN
+  </h2>
+</div><p class="component-content component">PointRCNN是李鸿升/王晓刚团队于2018年12月提出的基于LiDAR的3D检测算法。该算法是两阶段算法，第一阶段是自底向上生成3D proposal，第二阶段是由proposal获得预测结果。该方法与IPOD类似，都不需要对点云进行格式转换，直接处理点云来生成proposal。</p>
+<p class="component-content component">PointRCNN的整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-90f688663645393a447f267b39d5c4bc" id="lht90f688663645393a447f267b39d5c4bc">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220224102322.png" alt="image-20230220224102322"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220224102322
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该算法包含如下几个技术点：</p>
+<div class="component-content component"><ul>
+<li>以PointNet++为3D Backbone；</li>
+<li>用focal loss来改善样本不均衡问题；</li>
+<li>以3D框不会重叠为重要假设，将点云分为前景点和背景点，然后以自底向上的方式从前景点生成高质量的proposal；</li>
+</ul></div>
+<p class="component-content component">测试指标：在KITTI测试集上对car easy样本的AP为85.94%，同时对中等和困难样本的检测指标也有全面提升。具体数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-81a86022b9a0b282d32dab63d8faee2c" id="lht81a86022b9a0b282d32dab63d8faee2c">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220225023503.png" alt="image-20230220225023503"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220225023503
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pixor" class="pagebody-header">
+    PIXOR
+  </h2>
+</div><p class="component-content component">PIXOR是Raquel团队于2019年2月提出的一种基于LiDAR的一阶段3D检测算法。该算法的特点是速度很快，介于SECOND和PointPillars之间，在1080Ti上的推理速度约为28fps。</p>
+<p class="component-content component">PIXOR的整体架构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-6457dbdec6f5ab1e22c4288897e32fcf" id="lht6457dbdec6f5ab1e22c4288897e32fcf">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220225722866.png" alt="image-20230220225722866"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220225722866
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">其中：</p>
+<div class="component-content component"><ul>
+<li>输入数据转换为BEV，额外增加一个通道携带高度信息，同时丢弃反射强度信息；</li>
+<li>PIXOR检测器由一系列残差块、上采样以及3*3的卷积层组成；</li>
+</ul></div>
+<p class="component-content component">检测指标：作者在测试指标方面表现很奇怪，没有对3D框的准确性进行验证，只公布了BEV框的测试指标。具体数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-8de7f1b32ebddac6ad46490d8f3bc2d4" id="lht8de7f1b32ebddac6ad46490d8f3bc2d4">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220230310084.png" alt="image-20230220230310084"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220230310084
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">对于KITTI的car easy样本，BEV检测框的AP只有81.70%，可以推测其3D的的AP指标更低，与之前的SECOND相比毫无竞争力。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="std" class="pagebody-header">
+    STD
+  </h2>
+</div><p class="component-content component">STD是贾佳亚团队于2019年7月提出的一种基于LiDAR的3D检测算法，该算法的特点是对困难样本的检测指标提升明显。</p>
+<p class="component-content component">该算法是两阶段检测算法：</p>
+<div class="component-content component"><ul>
+<li>第一阶段是自底向上的proposal生成网络, 以原始点云为输入, 在每个点撒proposal种子, 然后生成proposal; 然后用PointsPool提取每个proposal的特征;</li>
+<li>第二阶段使用并行IOU来加速获取3D box;</li>
+</ul></div>
+<p class="component-content component">该算法的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-68f408aefca4a6438e77bf6fffb5a295" id="lht68f408aefca4a6438e77bf6fffb5a295">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220231813153.png" alt="image-20230220231813153"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220231813153
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该算法生成proposal的方式似乎结合了IPOD和PointRCNN的部分理念。为了生成精确的基于point的proposal，文章使用球形anchor，并且给每个anchor赋一个标签。
+对每个proposal，使用新的PointPool层将点云特征从稀疏表示转换为稠密表示，最后接一个框预测网络。</p>
+<p class="component-content component">另外一个核心贡献是使用PointPool对proposal进行特征提取。具体分为3步：</p>
+<div class="component-content component"><ol>
+<li>每个proposal内随机选N个点，其坐标及语义特征为初始特征；</li>
+<li>使用voxelization层将每个proposal进一步划分成多个voxel;</li>
+<li>使用VFE(voxle feature encoding)层对每个voxel进行特征提取；</li>
+</ol></div>
+<p class="component-content component">测试指标：在KITTI测试集上，对car easy样本的AP为86.61%， 增长一般，但是对困难样本的AP达到76.06%，增长非常大。具体数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-a2cc66e6d4b8bb483784b00f8aae23b8" id="lhta2cc66e6d4b8bb483784b00f8aae23b8">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230220232138171.png" alt="image-20230220232138171"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230220232138171
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="3dssd" class="pagebody-header">
+    3DSSD
+  </h2>
+</div><p class="component-content component">3DSSD是贾佳亚团队继STD之后提出的另一个基于LiDAR的3D检测算法，于2020年2月提出。该方法最大的创新在于：3DSSD是第一篇直接处理点云的一阶段检测算法。结果方面，检测精度和速度取得了不错的平衡：在Titan V上的推理时间为38ms，AP指标于2阶段方法相当，对car easy样本的AP为88.36%。不过该AP指标不是很可靠，稍后进行说明。</p>
+<p class="component-content component">3DSSD的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-fe3cb45ee982f0b24d4b2f219fda2e5e" id="lhtfe3cb45ee982f0b24d4b2f219fda2e5e">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221220302915.png" alt="image-20230221220302915"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221220302915
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">框架基本由3部分组成：</p>
+<div class="component-content component"><ul>
+<li>直接处理点云的3D Backbone;</li>
+<li>CG(candidate generation)层：主要功能是点云特征提取及下采样、偏移等；</li>
+<li>检测头；</li>
+</ul></div>
+<p class="component-content component">测试指标：对car easy样本的AP为88.36%，但是其他方法的指标虚高，主要原因应该是作者使用了4种数据增强方法。如果不进行数据增强，该算法的AP指标可能会下降2%左右。详细数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-d0ea0e684230cf0352fa4ea0b1765dbf" id="lhtd0ea0e684230cf0352fa4ea0b1765dbf">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221221557056.png" alt="image-20230221221557056"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221221557056
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="centerpoint" class="pagebody-header">
+    CenterPoint
+  </h2>
+</div><p class="component-content component">CenterPoint是Philipp Krähenbühl团队于2020年6月提出的一种基于point的3D检测方法，是继PointNet系列和3DSSD之后，另一篇基于point的代表性检测算法，整体框架是基于CenterNet结构在点云上的应用。</p>
+<p class="component-content component">值得说明的是，Waymo数据集于2020年发布，该文章率先在Waymo上进行了指标测试，开启了基于Waymo的3D检测时代。Waymo与KITTI不同点在于：Waymo数据集更复杂，每帧点云数量更大，许多在KITTI上表现较好的方法，在Waymo上的测试指标反而一般。主要原因就是那些方法的显存消耗大，Waymo上的大点云数量限制了那些方法的效果。因此后来的很多方法都致力于减少显存消耗方面的优化。</p>
+<p class="component-content component">CenterPoint的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-10f00b9de4693c0ef53fc824e348a6af" id="lht10f00b9de4693c0ef53fc824e348a6af">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221224950802.png" alt="image-20230221224950802"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221224950802
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<div class="component-content component"><ol>
+<li>第一阶段是head模块, 预测各种信息, 包括类别, 尺寸, 位置, 朝向, 速度等信息. 其中:
+<div class="component-content component"><ul>
+<li>目标中心点是通过热力图来估计的. 具体参见CenterNet;</li>
+<li>位置细化回归头:</li>
+<li>速度头: 速度用于跟踪;</li>
+</ul></div>
+</li>
+<li>第二阶段从backbone的输出提取附加的点特征, 即提取每个面的中心点特征. 由于在俯视图上重合, 只需提取5个点的特征, 具体操作通过MLP实现.</li>
+</ol></div>
+<p class="component-content component">测试指标：在Waymo上机动车L1样本的mAP为80.2，没在KITTI上测试。具体数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-17f5995371c78dde197048af511a45d0" id="lht17f5995371c78dde197048af511a45d0">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221225629627.png" alt="image-20230221225629627"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221225629627
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pv-rcnn" class="pagebody-header">
+    PV-RCNN
+  </h2>
+</div><p class="component-content component">PV-RCNN是李鸿升、王晓刚团队于2020年6月提出的一篇基于LiDAR的3D检测算法。该算法的主要贡献在于：首次提出结合point和voxel各自优点的方法。之前的方法要么基于point，要么基于voxel/pillars：</p>
+<div class="component-content component"><ul>
+<li>point保留了精确的深度、距离信息，但是基于point的方法计算量大，内存消耗多；</li>
+<li>voxel计算量少，能产生高质量的proposal，有更多的上下文信息，但是voxelization过程种会丢失深度和距离等信息；</li>
+</ul></div>
+<p class="component-content component">PV-RCNN对之前的算法进行了细致的分析，然后创造性地提出一种将point和voxel优点结合的方法。实验结果也表明，PV-RCNN这种结合两种数据形式的思路是正确的，而且作者提出的结合方式也很有效：从指标来看，在KITTI上的car easy样本的AP达到90.25%，远远高于之前的方法。而该方法在相当长的一段时间内，在KITTI上的保持着非常有竞争力的指标。直到2021年6月，随着SE-SSD的提出，KITTI上才有了比PV-RCNN有明显优势的新指标。而这段时间内，各种方法都在借鉴PV-RCNN的设计思路，企图对指标有进一步的刷新，比如Voxel RCNN/PV-RCNN++/M3DeTR等优秀算法。</p>
+<p class="component-content component">PV-RCNN算法的缺点是计算速度慢，内存消耗多，尤其是在Waymo等点云数量大的数据集上，可以将PV-RCNN的缺点进一步放大。</p>
+<p class="component-content component">PV-RCNN的设计思路是：基于团队之前提出的PointRCNN框架进行优化，加入voxel的信息。整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-19953b2fbd8757a44fdcd38637aa8b92" id="lht19953b2fbd8757a44fdcd38637aa8b92">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221231843373.png" alt="image-20230221231843373"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221231843373
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该算法的核心模块有：</p>
+<div class="component-content component"><ul>
+<li>
+<p class="component-content component">voxel-to-keypoint 编码: 使用voxel CNN对voxel进行稀疏3D卷积来获得voxel特征和高质量proposal; 为减少此步骤的内存开销, 选择少量关键点来概括voxel的全局3D信息; 其中关键点特征由邻域voxel特征聚合而成, 而领域voxel特征由PointNet学习获得. 此步骤可以通过多尺度特征高效获得全局信息.</p>
+</li>
+<li>
+<p class="component-content component">keypoint-to-grid ROI特征抽象: 提出一种ROI-grid pooling模型, 使用多尺度的关键点特征来聚合grid点的特征. 此步骤对置信度估计和3D框位置优化有帮助.</p>
+</li>
+</ul></div>
+<p class="component-content component">具体细节如下:</p>
+<div class="component-content component"><ol>
+<li>3D voxel CNN: 将输入点云划分为$L<em>W</em>H$的相同大小的方块,  然后计算非空voxel的特征, 每个voxel的特征为其内部所有point的特征的均值. 具体计算时使用$3<em>3</em>3$的3D稀疏卷积.</li>
+<li>3D proposal生成: 先将3D特征图按Z轴方向切分, 堆叠成一系列的2D特征图, 然后借鉴SECOND和PointPillars的anchor方法生成proposal, 该方法生成的proposal的召回率比PointRCNN和STD的高, 如下表所示:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-60177786c4750f150c2a285055f47b4d" id="lht60177786c4750f150c2a285055f47b4d">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1wVYltKRcLC" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+
+原因在于: 传统3D Voxel CNN提取的特征下采样太多, 丢失了准确的位置信息, 即使上采样也只能获取很少的邻域特征, 所以进一步的proposal的召回率就不够高. 而PointNet方法可以获得任何范围的邻域特征, 所以其特征编码能力远强于voxel CNN方法.</li>
+<li>为结合voxel和point方法, 本文提出RoI grid pooling模块, 具体包含两个技术点:
+<div class="component-content component"><ul>
+<li>voxle-to-keypoint: 从voxel中采样2048或4096个点作为关键点, 然后用voxel set abstraction模块对关键点进行特征编码, 此处借鉴PointNet++的集合抽象方法; 然后用关键点生成proposal, 此处有个关键点权重计算模块, 前景关键点和背景关键点的重要性不同, 该权重计算模块为PKW(predicted keypoint weighting), 结构如下图所示:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-85d1c8403d36a8b4959cdb77e8e4520a" id="lht85d1c8403d36a8b4959cdb77e8e4520a">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1wVh6ufzZz6" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</li>
+<li>keypoint-to-grid: 从每个proposal中采样$6<em>6</em>6$个grid point, 从关键点聚合grid point特征时, 设置半径r, 每个grid point从r范围内的关键点聚合特征,. 我们设置不同大小的r来获得不同感受野的特征. 之后用两层MLP获得proposal的特征表示. 示意图如下所示:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-344b55f2f8c5a7125d854db80be88cfa" id="lht344b55f2f8c5a7125d854db80be88cfa">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1wVjudn7dvU" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+
+4, proposal细化及置信度预测: 用两层MLP实现.</li>
+</ul></div>
+</li>
+</ol></div>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-37aae68888950cb67e41acd104441ce3" id="lht37aae68888950cb67e41acd104441ce3">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221232334359.png" alt="image-20230221232334359"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221232334359
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-bc28401ee46c9dc13c43f2d1c9a00a39" id="lhtbc28401ee46c9dc13c43f2d1c9a00a39">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221232431908.png" alt="image-20230221232431908"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221232431908
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pointformer" class="pagebody-header">
+    Pointformer
+  </h2>
+</div><p class="component-content component">Pointformer是黄高、Li Erran Li团队于2020年12月提出的基于LiDAR的3D检测算法。该算法首次以Transformer作为点云特征提取的3D Backbone，从此开启了基于transformer的LiDAR 3D检测时代。后面借鉴该transformer思路的典型算法有：M3DeTR/CT3D/VoTr/CenterFormer/DSVT等。</p>
+<p class="component-content component">Pointformer的整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-beac204eed6430c07ff757b1b390f93e" id="lhtbeac204eed6430c07ff757b1b390f93e">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221233334200.png" alt="image-20230221233334200"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221233334200
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">其中包含以下几个组件:</p>
+<div class="component-content component"><ul>
+<li>LT(local transformer)模块: 学习目标级的上下文依赖区域特征, 代表point与局部区域的信息交互;</li>
+<li>坐标细化模块: 调整从FPS(furthest point sampling)采样获得的目标中心点, 来改善proposal的质量;</li>
+<li>LGT(Local-Global Transformer)模块: 从更高层面的表征上结合局部特征和全局特征;</li>
+<li>GT(Global Transformer)模块: 在场景层面学习注意上下文的特征;</li>
+</ul></div>
+<p class="component-content component">测试指标：在KITTI上对car easy样本的AP为87.13%，除了PV-RCNN，与其他算法相比还是很有竞争性的，可惜PV-RCNN太过优秀。。。。</p>
+<p class="component-content component">具体测试数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-b1cce1b18d79370cbaabddb7e3755710" id="lhtb1cce1b18d79370cbaabddb7e3755710">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230221233523456.png" alt="image-20230221233523456"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230221233523456
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="voxel-r-cnn" class="pagebody-header">
+    Voxel R-CNN
+  </h2>
+</div><p class="component-content component">Voxel R-CNN是张燕咏、李厚强团队于2020年12月提出的基于LiDAR的两阶段3D检测算法。该算法借鉴了SECOND和PV-RCNN的思路，对PV-RCNN中Point那一路做了精简，通过Voxel RoI pooling模块结合2D BEV信息和3D voxel信息，达到与PV-RCNN相似的效果。</p>
+<p class="component-content component">Voxel RCNN的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-0ecc8428d0e5c16840806a5db65942c3" id="lht0ecc8428d0e5c16840806a5db65942c3">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222183749503.png" alt="image-20230222183749503"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222183749503
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">相比于PV-RCNN，Voxel RCNN砍掉了复杂耗时的关键点采样、SA层，所以运算速度和内存占用等方面都有显著改善，而这些改善也可以从指标看出。</p>
+<p class="component-content component">测试指标：在KITTI上对car easy样本的AP为90.90%，比PV-RCNN提高0.65个百分点，改善不多；但是在Waymo上对vehicle L1样本的mAP为75.59，比PV-RCNN高了5.29个点，这点正是因为Voxel RCNN减少了内存消耗，进而释放了模型的能力。详细数据如下所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-49137f506be78003f4a65b1a824f3e01" id="lht49137f506be78003f4a65b1a824f3e01">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222184635794.png" alt="image-20230222184635794"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222184635794
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-8cc936001ae9722e62fd28016c3e71f0" id="lht8cc936001ae9722e62fd28016c3e71f0">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222184803155.png" alt="image-20230222184803155"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222184803155
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pv-rcnn-1" class="pagebody-header">
+    PV-RCNN++
+  </h2>
+</div><p class="component-content component">PV-RCNN++是李鸿升、王晓刚团队继PV-RCNN之后的改进版本，于2021年1月提出。该算法的主要改进方向同Voxel-RCNN一样：提高PV-RCNN结构在点云数量多的输入下的检测指标和检测速度，因此该算法主要在Waymo上进行了测试。</p>
+<p class="component-content component">PV-RCNN++的整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-9333c4bef61dcf9607ea8d47f391aa7c" id="lht9333c4bef61dcf9607ea8d47f391aa7c">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222185617656.png" alt="image-20230222185617656"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222185617656
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">改善的主要原因有两个:</p>
+<div class="component-content component"><ul>
+<li>基于sector的proposal质心采样可以产生更具代表性的keypoints；</li>
+<li>VectorPool可以更好聚合局部point特征, 同时减少资源消耗;</li>
+</ul></div>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-91cab2faef0e0e7c9204a588bb9ca371" id="lht91cab2faef0e0e7c9204a588bb9ca371">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222191034447.png" alt="image-20230222191034447"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222191034447
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="m3detr" class="pagebody-header">
+    M3DeTR
+  </h2>
+</div><p class="component-content component">M3DeTR是Larry Davis, Dinesh Manocha团队于2021年4月提出的一种3D检测算法。该算法的创新点在于：提出一种3D检测框架，可以将Point、voxel的数据形式与Transformer结合起来。该框架结构对多模传感器融合很友好，基于LC融合的3D检测算法可以考虑借鉴此思路。</p>
+<p class="component-content component">该算法的基本框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-577ecfc8d43116a8d30351b028a89829" id="lht577ecfc8d43116a8d30351b028a89829">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222203803579.png" alt="image-20230222203803579"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222203803579
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">基本模块如下:</p>
+<div class="component-content component"><ol>
+<li>多表征形式的特征结合: 将输入点云进行编码到3个内嵌空间, 即voxel空间, point空间和BEV空间. 编码过程如下:
+<div class="component-content component"><ul>
+<li>voxel编码: 通过使用VoxenNet中的voxelization层将点云划分为voxel, 然后使用3D稀疏卷积提取不同尺度的voxel特征, 具体提取的特征为$f^{voxel} = {f^{voxel  1*}, f^{voxel  2*}, f^{voxel  4*}, f^{voxel  8*}}$, 这点于VoxelNet和SECOND不同;</li>
+<li>BEV编码: 对voxel的8倍下采样特征使用2D卷积, 然后生成BEV形式的特征. 具体过程是将z轴信息channel化, 然后2D卷积包含两个encoder-decoder模块, 每个encoder-decoder模块包含用来生成top-down特征的2D下采样卷积层,和上采样到输入尺寸的反卷积层; 其中不论encoder还是decoder, 都包含一系列的$3*3$卷积层, BN层和ReLU层;</li>
+<li>每帧点云数据都有10K以上的point, 为了确保内存消耗和信息有效性, 我们采用最远点采样FPS(Furthest Point Sampling)算法对点云采样n个关键点(keypoint), 采用PointNet++的SA(Set Abstration)和PV-RCNN的VSA(Voxel Set Abstration)分别产生关键点的特征;</li>
+</ul></div>
+</li>
+<li>针对多表征形式, 多尺度, 相互关系的Transformer: 分别产生$F^{voxel}, F^{point}, F^{bev}$之后, 就可以将各种表征形式的特征进一步结合, 产生多表征形式, 多尺度, 多点的特征.  Transformer基本: Transformer是一系列的encoder-decoder层,  靠自注意机制计算输入和输出的表征, 自注意的输出公式如下:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-11dc214eb7ec0c1d6c0466d33fbfa64a" id="lht11dc214eb7ec0c1d6c0466d33fbfa64a">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1wpsRc02dxh" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+, 提出两层encoder的M3 Transformer, 分别是多表征多尺度Transformer和多关联关系Transformer, 如下图所示:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-324094c1af60f56abacd5183619f6ac3" id="lht324094c1af60f56abacd5183619f6ac3">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1wpt9icRMzR" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+
+<div class="component-content component"><ul>
+<li>多表征形式多尺度Transformer(multi-representation and multi-scale transformer): 对于每个点云, 对transformer层的输入序列是其一系列点云特征, 包括不同尺寸和不同表征形式的特征. 具体来说, 输入序列为$F = [F^{voxel 1*}, F^{voxle 2*}, F^{volex 4*}, F^{voxel 8*},  F^{point}, F^{bev}]$,  其输出是各形式各尺度的特征聚合之后的特征向量; 为解决各特征维度不同的问题, 我们使用单层感知机对特征维度进行对齐. 维度对齐后的特征为: $\hat{F} = [\hat{F}^{voxel 1*}, \hat{F}^{voxle 2*}, \hat{F}^{volex 4*}, \hat{F}^{voxel 8*},  \hat{F}^{point}, \hat{F}^{bev}]$, 之后将这些特征输入到transformer层中, 产生自注意特征.</li>
+<li>多关联Transformer(Mutual-relation transformer): 受PointNet/PointNet++/PointFormer启发, 我们在transformer中加入Mutual-relation层将point邻域信息融合到特征中. 具体的做法是: 将上一级的Transformer输出特征级联, 即$T = concat[T^{voxel 1*}, T^{voxle 2*}, T^{volex 4*}, T^{voxel 8*},  T^{point}, T^{bev}]$, n个关键点的级联特征$T_i$输入到Mutual-relation Transformer中, 利用多头主力机制处理后的特征即为带有点云间关联信息的特征;</li>
+</ul></div>
+</li>
+<li>检测头: 两阶段, 包括RPN和RCNN, 具体参考PV-RCNN. 其中RPN用2D卷积从BEV特征中生成3D proposal; RCNN细化proposal.</li>
+</ol></div>
+<p class="component-content component">测试指标：在KITTI和Waymo上都有测试，都比PV-RCNN有小幅提升。</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-de42069201145105e86831cff3c5fe01" id="lhtde42069201145105e86831cff3c5fe01">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222204222830.png" alt="image-20230222204222830"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222204222830
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-f616f6af5633cebbe619af7311e810c6" id="lhtf616f6af5633cebbe619af7311e810c6">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222204113964.png" alt="image-20230222204113964"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222204113964
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="se-ssd" class="pagebody-header">
+    SE-SSD
+  </h2>
+</div><p class="component-content component">SE-SSD当前在KITTI 3D检测榜上排名第2，是傅志荣团队于2021年6月提出的一种基于LiDAR的one-stage 3D检测算法。该算法的特点是检测精度高的同时速度快，在Titan XP上的单帧推理时间为30ms。该算法的核心理念是: 通过对自定义约束的软目标和硬目标来联合优化模型, 同时不引入额外计算量。</p>
+<p class="component-content component">具体来说, SE-SSD包含一个teacher SSD和一个student SSD, 其中对teacher SSD进行高效的基于IOU的匹配策略来过滤器软目标, 然后通过一致损失来将Teacher SSD的预测结果与student SSD的预测结果对齐。
+同时, 为使蒸馏知识最大化, 我们设计了一种形状感知的增强样本来训练student SSD, 使其预测的目标形状更准确。
+最后, 为更好处理难例, 作者设计了ODIoU损失函数来监督Student SSD, 该损失函数对目标质心和朝向的预测结果有约束。</p>
+<p class="component-content component">SE-SSD的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-7624eccb63bee4a38f023de647d911a0" id="lht7624eccb63bee4a38f023de647d911a0">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222205322092.png" alt="image-20230222205322092"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222205322092
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">基本推理流程如下:</p>
+<div class="component-content component"><ol>
+<li>先用预训练的SSD初始化teacher和student;</li>
+<li>用输入点云训练整个模型, 走两个分支:
+<div class="component-content component"><ul>
+<li>teacher从输入点云中预测出相对准确的结果, 然后对这些结果进行全局转换, 将转换后的结果作为软目标, 这些软目标用来监督student;</li>
+<li>第二路也用teacher检测和全局转换, 转换之后进行形状数据增强, 然后将增强的结果输入到student中, 并对其训练, 然后对teacher和student的预测结果通过一致损失进行对齐, 同时用形状增强的student输入对student输出进行监督, 监督的损失为考虑朝向信息的IOU。</li>
+</ul></div>
+</li>
+</ol></div>
+<p class="component-content component">其中teacher SSD和student SSD的结构与CIA-SSD基本一致, 除了移除了置信度函数和DI-NMS。此外, 框架还包含稀疏卷积网络, BEV卷积网络, 多任务head。</p>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-74ad0aa2b5b4bf62e562b150cdde1eef" id="lht74ad0aa2b5b4bf62e562b150cdde1eef">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222205838409.png" alt="image-20230222205838409"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222205838409
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-09b51b0f4da2770f26cfea4cbcc2ddb2" id="lht09b51b0f4da2770f26cfea4cbcc2ddb2">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222205632450.png" alt="image-20230222205632450"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222205632450
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="ct3d" class="pagebody-header">
+    CT3D
+  </h2>
+</div><p class="component-content component">CT3D是阿里达摩院的华先胜团队与浙大合作的一篇LiDAR 3D检测文章，于2021年8月发表。这是一种two-stage检测框架，论文重点聚焦于提高proposal的质量。核心技术点是： 对每个proposal的point提取特征时, 既进行channel-wise的上下文聚合, 也进行proposal-aware embedding。但是在数据集上的测试数据表明，该技术效果一般。因此本文不描述其技术细节，介绍此文目的在于：为评估阿里在LiDAR感知方面的能力提供参考。</p>
+<p class="component-content component">CT3D整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-2f2806f3e608ee9644631774f1c3bd47" id="lht2f2806f3e608ee9644631774f1c3bd47">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222211612586.png" alt="image-20230222211612586"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222211612586
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">测试指标：在KITTI和Waymo上都没什么竞争力，具体数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-0f867a656cc93087eb428cb8759ea1aa" id="lht0f867a656cc93087eb428cb8759ea1aa">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222211805000.png" alt="image-20230222211805000"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222211805000
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-49fe8f115ffeca2510ce415b04b21b30" id="lht49fe8f115ffeca2510ce415b04b21b30">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222211832972.png" alt="image-20230222211832972"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222211832972
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="votr" class="pagebody-header">
+    VoTr
+  </h2>
+</div><p class="component-content component">接下来介绍3篇我司与高校合作的LiDAR检测算法。</p>
+<p class="component-content component">VoTr(VoxelTransformer)是2012实验室的徐航团队与港中文、新加坡国立大学及中山大学的梁晓丹团队合作提出的一篇3D检测算法，于2021年9月提出。该算法的核心思想如同标题：将Transformer机制与voxel结合，是一种应用于LiDAR点云的3D Backbone。</p>
+<p class="component-content component">VoTr基于Transformer的架构, 使得可以通过self-attention机制获得大范围的关系信息。
+由于实际情况下, 非空voxel的分布稀疏且数量巨大, 直接对voxel使用transformer会带来很大的计算量。因此, 作者提出稀疏voxle模块及submanifold voxel模块, 可以在voxel和空voxel上高效执行。</p>
+<p class="component-content component">为进一步增加注意力范围的同时维持与传统方法相当的计算量, 作者为多头注意力机制提出两种注意力模块:</p>
+<div class="component-content component"><ul>
+<li>局部注意(Local Attention):</li>
+<li>扩张注意(Dilated Attention):</li>
+</ul></div>
+<p class="component-content component">之后还提出了快速voxel查询(Fast Voxel Query)机制, 来加速多头注意力的查询过程。</p>
+<p class="component-content component">VoTr整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-84c41431e2cd31aa8d965e1dd63578d8" id="lht84c41431e2cd31aa8d965e1dd63578d8">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222214128887.png" alt="image-20230222214128887"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222214128887
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">测试指标：在KITTI上对car easy样本的AP为89.90%，在Waymo上对vehicle L1样本的mAP为74.95。详细数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-50157d8a375936f26b3008e9bbaacbc4" id="lht50157d8a375936f26b3008e9bbaacbc4">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222214605825.png" alt="image-20230222214605825"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222214605825
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-766ff40e07c70214aedfbec415805fbd" id="lht766ff40e07c70214aedfbec415805fbd">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222214646873.png" alt="image-20230222214646873"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222214646873
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pyramid-r-cnn" class="pagebody-header">
+    Pyramid R-CNN
+  </h2>
+</div><p class="component-content component">Pyramid RCNN是我司2012实验室徐航团队与港中文及中山大学梁晓丹团队合作的一种基于LiDAR的3D检测算法。从名字不难看出，该算法是two-stage算法，而该算法致力于改善第二阶段。该算法的特点是：对简单场景的提升不明显，对中等和困难场景有较大提升。</p>
+<p class="component-content component">之前的两阶段方法中, 第二阶段主要是从point或voxel中提取ROI 特征, 但是这些方法对稀疏不规则分布的点云处理效率不高, 进而导致检测结果不准确.
+为解决这个问题, 作者提出一个新的第二阶段处理模块: pyramid RoI head, 该模块可以自适应从稀疏点云中学习RoI特征. pyramid RoI head包含3个关键组件:</p>
+<div class="component-content component"><ul>
+<li>RoI-grid Pyramid: 以金字塔方式为每个RoI搜集point;</li>
+<li>RoI-grid Attention: 通过结合传统的注意力机制和基于图的点云算子, 从点云中编码更丰富的信息;</li>
+<li>Density-Aware Radius Prediction: 可以动态调整RoI的rang范围, 来适应各种密度的点云输入;</li>
+</ul></div>
+<p class="component-content component">Pyramid RCNN的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-22379e7b018d096b84c6d045cf013652" id="lht22379e7b018d096b84c6d045cf013652">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222215326016.png" alt="image-20230222215326016"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222215326016
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-6c4953d6402c338606fdb788b2945de4" id="lht6c4953d6402c338606fdb788b2945de4">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222215518427.png" alt="image-20230222215518427"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222215518427
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-0975d51a26620cab6203aa660d0a315f" id="lht0975d51a26620cab6203aa660d0a315f">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222215426939.png" alt="image-20230222215426939"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222215426939
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="point2seq" class="pagebody-header">
+    Point2Seq
+  </h2>
+</div><p class="component-content component">Point2Seq是2012实验室徐航团队与新加披国立大学Xinchao Wang团队及港中文王晓刚团队合作的3D检测算法。该算法极富想象力，核心思想是把3D检测任务看作单词序列解码任务。Point2Seq的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-f4583289fa49d2cd155dcaa3bb44497f" id="lhtf4583289fa49d2cd155dcaa3bb44497f">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222220317221.png" alt="image-20230222220317221"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222220317221
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该框架与以往框架的不同点在于:
+以往的框架都是一次检测所有目标, 但是此算法对各目标之间的依赖关系进行了建模, 通过各目标之间的关系信息来提高检测精度. 具体流程如下:</p>
+<div class="component-content component"><ol>
+<li>此算法将每个3D目标视为单词序列, 然后就可以将3D检测任务转化为以自回归(auto-regressive)方式对3D场景进行单词序列解码工作;</li>
+<li>基于上述任务, 作者开发出了一个轻量化的场景到单词序列的解码模块, 该解码模块根据场景信息和之前的单词序列线索进行自动回归生成单词序列;</li>
+<li>最终预测的单词序列是对3D目标的一系列完整描述,  然后根据相似度将检测结果和真值进行映射;</li>
+</ol></div>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-713eac48922469612860f05c090fd60a" id="lht713eac48922469612860f05c090fd60a">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222220537765.png" alt="image-20230222220537765"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222220537765
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">值得说明的是：该文章在新数据集ONCE上也进行了测试，而ONCE数据集也是徐航团队构建的。具体测试数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-8fda7c6e61dcd6b4df0ab8138894c7f6" id="lht8fda7c6e61dcd6b4df0ab8138894c7f6">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222220659430.png" alt="image-20230222220659430"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222220659430
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="dsvt" class="pagebody-header">
+    DSVT
+  </h2>
+</div><p class="component-content component">DSVT是北大王立威团队于2023年1月提出的LiDAR 3D检测算法，目前在Waymo榜单上排名第一。该算法的特点是精度高且易部署，因为算法没用任何自定义算子。</p>
+<p class="component-content component">为了能高效并行处理稀疏点云数据, 作者提出动态稀疏窗口注意机制DSWA(Dynamic Sparse Window Attention),  根据区域的稀疏性将各区域分配到每个窗口中, 然后以并行的方式计算所有区域的特征。为有效下采样和更好编码几何信息, 作者提出注意力风格的3D池化模块, 该模块很强, 没用任何自定义的CUDA算子。DSVT的整体架构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-faa4493fa3785c65100b58c8d20ff3a6" id="lhtfaa4493fa3785c65100b58c8d20ff3a6">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222221247693.png" alt="image-20230222221247693"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222221247693
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">基本处理流程如下:</p>
+<div class="component-content component"><ol>
+<li>将输入点云转换为voxel: 使用voxel特征编码模块VFE(Voxel Feature Encoding), 在这一步, 考虑到transformer结构的感受野较大, 同时室外目标相对较小的情况, 本文不需要使用hierarchical 的表示形式, 只需一个单步长的网络, 与文章Embracing Single Stride 3D Object Detector with Sparse Transformer一致,;</li>
+<li>然后用一系列带有DSVT(Dynamic Sparse Voxel Transformer)的voxel transformer模块处理这些voxel;</li>
+<li>为了将稀疏voxel联系起来, 我们设计了两个分配方法:
+<div class="component-content component"><ul>
+<li>rotated set: 窗间特征聚合;</li>
+<li>hybrid window: 窗内特征聚合;</li>
+</ul></div>
+</li>
+<li>可学习3D pooling模块: 用于高效下采样, 编码精确的3D几何信息且不需要自定义算子;</li>
+<li>DSTV输出的voxel特征映射到BEV;</li>
+<li>采用CenterNet样式的检测头, 检测最终的box;</li>
+</ol></div>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-eec4095477417a874781e1aa4915ee3f" id="lhteec4095477417a874781e1aa4915ee3f">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222221442491.png" alt="image-20230222221442491"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222221442491
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="spg" class="pagebody-header">
+    SPG
+  </h2>
+</div><p class="component-content component">接下来4篇文章通过改善输入数据来提高检测质量，下面一一介绍。</p>
+<p class="component-content component">SPG是Waymo的Dragomir Anguelov团队于2021年8月提出的一种基于LiDAR的3D检测算法。该算法的核心思想是通过补全点云来提升检测指标，因此对中等和困难样本的检测提升显著。</p>
+<p class="component-content component">作者注意到远处点云密度显著下降, 进而影响检测精度, 因此提出语义点云生成SPG(Semantic Point Generation)的方法, 用于对传统lidar检测器进行增强。具体做法是: 在预测的前景区域中产生语义点云, 恢复由遮挡/低反射率/天气等原因而丢失的点云。SPG整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-8185e43a3cd88bf87fd149f09cca0732" id="lht8185e43a3cd88bf87fd149f09cca0732">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222224525551.png" alt="image-20230222224525551"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222224525551
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">点云生成的效果对比如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-25f5644975bb1e59cfaffba1b217d52d" id="lht25f5644975bb1e59cfaffba1b217d52d">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222224625440.png" alt="image-20230222224625440"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222224625440
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-5bb733c3698571b3eae4a6415a5c24f2" id="lht5bb733c3698571b3eae4a6415a5c24f2">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222224830274.png" alt="image-20230222224830274"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222224830274
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="btcdet" class="pagebody-header">
+    BtcDet
+  </h2>
+</div><p class="component-content component">BtcDet是USC于2021年12月提出的基于LiDAR的3D检测算法。</p>
+<p class="component-content component">实际环境中, 因为存在遮挡、反射、天气等原因, 使得lidar不能完全感知目标形状, 因此也给3D检测带来很多挑战。为解决此问题, 作者提出一种新的基于点云的3D检测方法: BtcDet(Behind the Curtain Detector), 通过学习目标的先验形状和估计倍遮挡目标的完整形状来改善检测效果。该算法的核心思想是: 模型预测目标存在的概率, 进而判断目标的形状。通过这个概率图(probability map), 本模型能产生高质量的proposal, 最后在proposal细化的时候也参考概率图的信息。</p>
+<p class="component-content component">BtcDet的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-6cc6c64a08590a0ff4d7b4e638ed915e" id="lht6cc6c64a08590a0ff4d7b4e638ed915e">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222225421596.png" alt="image-20230222225421596"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222225421596
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">基本流程如下:</p>
+<div class="component-content component"><ol>
+<li>
+<p class="component-content component">首先识别遮挡和信号丢失区域, 然后用形状遮挡网络估计目标形状可能性:</p>
+<div class="component-content component"><ul>
+<li>对于车和自行车, 将点云按中心面对称;</li>
+<li>以相邻目标进行点云补全;</li>
+<li>如果是球坐标系, 对被遮挡后的空间进行voxel化, 对可能存在目标的区域补点云;</li>
+<li>开始训练:</li>
+</ul></div>
+<p class="component-content component">示意图如下所示:</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-a2278c08a4f8c2302f93e358e4b067b5" id="lhta2278c08a4f8c2302f93e358e4b067b5">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222225538833.png" alt="image-20230222225538833"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222225538833
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+</li>
+<li>
+<p class="component-content component">用backbone提取点云3D特征, 然后将3D特征和形状可能性张量结合, 将结合特征送到RPN产生proposal;</p>
+</li>
+<li>
+<p class="component-content component">proposal细化;</p>
+</li>
+</ol></div>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-182114d11917fd1694ee667261eeedd8" id="lht182114d11917fd1694ee667261eeedd8">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222225626081.png" alt="image-20230222225626081"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222225626081
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-a11d0701562f545be94752e785a1c577" id="lhta11d0701562f545be94752e785a1c577">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222225652806.png" alt="image-20230222225652806"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222225652806
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="pda" class="pagebody-header">
+    PDA
+  </h2>
+</div><p class="component-content component">PDA是Steven Waslander团队于2022年3月提出的基于LiDAR的3D检测方法。该方法的特点是考虑了点云密度与距离的关系，进行针对此特性对点云进行了优化。</p>
+<p class="component-content component">PDA整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-b464e6e6993e000d061920e8e039eacf" id="lhtb464e6e6993e000d061920e8e039eacf">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222230820589.png" alt="image-20230222230820589"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222230820589
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该框架的基本处理流程是:</p>
+<div class="component-content component"><ol>
+<li>从3D稀疏卷积backbone中通过voxel质心来高效获取voxel位置特征;</li>
+<li>然后将voxel位置特征通过density-aware RoI grid pooling模块利用KDE(kernel density estimation)和点云密度位置编码的自注意聚合;</li>
+<li>最后利用距离与点云密度的关系, 对3D框进行最后的细化和置信度修正;</li>
+</ol></div>
+<p class="component-content component">测试指标：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-3a223ac780e44058c437063aaf97ca6c" id="lht3a223ac780e44058c437063aaf97ca6c">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222231009796.png" alt="image-20230222231009796"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222231009796
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-6359c2b5eabb01045cd37e20805a8723" id="lht6359c2b5eabb01045cd37e20805a8723">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222231032294.png" alt="image-20230222231032294"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222231032294
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="glenet" class="pagebody-header">
+    GLENet
+  </h2>
+</div><p class="component-content component">GLENet是香港城市大学于2022年7月提出的LiDAR 3D检测算法，目前在KITTI榜单上排名第一。该算法的主要创新点是考虑了训练数据的准确却性，并提出改善方法。其特点是即插即用，插件化特性；同时检测精度很好。</p>
+<p class="component-content component">对检测结果准确度建模的方法有两种, 如下图所示:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-120e13a2be34969b2b51a68bc55b0502" id="lht120e13a2be34969b2b51a68bc55b0502">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222231708151.png" alt="image-20230222231708151"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222231708151
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">作者采用第二种方法的设计理念,  自定义一种强有力的基于深度学习的标签不确定性量化框架。
+GLENet就是获取目标框潜在位置的方法。在推理阶段, 我们生成多个潜在的目标框, 如下图所示:
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-5863d1a8878a05ef19ac11dada8842e7" id="lht5863d1a8878a05ef19ac11dada8842e7">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222231814207.png" alt="image-20230222231814207"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222231814207
+      </div>
+    </div>
+  </div>
+</figure>
+
+此外, 作者还提出考虑不确定性的检测质量估计模块UAQE(uncertainty-aware quality estimator), 对检测质量进行估计。</p>
+<p class="component-content component">GLENet的整体框架如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-bec5988f9da13322b27a9b247e7736a2" id="lhtbec5988f9da13322b27a9b247e7736a2">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222232157410.png" alt="image-20230222232157410"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222232157410
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">测试指标：在KITTI测试集上对car easy样本的AP为91.67%，详细数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-1340224e75667a2199cb604778224549" id="lht1340224e75667a2199cb604778224549">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230222232227339.png" alt="image-20230222232227339"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230222232227339
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h1 id="总结与展望" class="pagebody-header">
+    总结与展望
+  </h1>
+</div><p class="component-content component">前面对基于LiDAR的3D检测算法进行了总体介绍及典型算法介绍。本节对前面的经典方法进行分类和总结，具体安排如下：</p>
+<div class="component-content component"><ol>
+<li>从数据形式的角度介绍和分析基于LiDAR数据的3D检测模型，包括：
+<div class="component-content component"><ul>
+<li><strong>基于原始点云的方法</strong>；</li>
+<li><strong>基于将点云划分为各种grid的方法</strong>；</li>
+<li><strong>基于point-voxel的方法</strong>；</li>
+<li><strong>基于range的方法</strong>；</li>
+</ul></div>
+</li>
+<li>从学习方式的角度介绍各种3D检测模型，包括：
+<div class="component-content component"><ul>
+<li><strong>基于anchor的方法</strong>；</li>
+<li><strong>anchor-free的框架</strong>；</li>
+<li><strong>基于lidar的3D检测中的一些辅助任务</strong>；</li>
+</ul></div>
+</li>
+</ol></div>
+<p class="component-content component">基于lidar的3D检测方法的里程碑如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-40fbd19801860c0734324602a2718202" id="lht40fbd19801860c0734324602a2718202">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230225204505026.png" alt="image-20230225204505026"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230225204505026
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="基于原始点云的3d检测方法" class="pagebody-header">
+    基于原始点云的3D检测方法
+  </h2>
+</div><p class="component-content component">基于点云的3D检测框架如下：</p>
+<div class="component-content component"><ol>
+<li>点云数据先经过基于点的backbone网络，点云算子对点逐步采样并学习特征；</li>
+<li>基于下采样点和特征进行3D框预测；</li>
+</ol></div>
+<p class="component-content component">框架示意图如下所示：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-f736572e91fd6267a4814b81206e1532" id="lhtf736572e91fd6267a4814b81206e1532">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rCD8Ao2aLA" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">该框架有两个基本组件：</p>
+<div class="component-content component"><ol>
+<li>
+<p class="component-content component">点云采样：PointNet++中提出的FPS(Furthest Point Sampling)采样方法被其他基于点云的检测方法广泛使用，比如：</p>
+<div class="component-content component"><ul>
+<li>PointRCNN首次应用FPS将输入点云逐步下采样，然后从下采样点中生成3D proposal;</li>
+<li>IOPD在FPS范式的基础上引入了分割指导滤波(segmentation guided filtering);</li>
+<li>3DSSD在FPS范式的基础上引入了特征空间采样(feature space sampling);</li>
+<li>StarNet在此范式的基础上引入了随机采样；</li>
+<li>PointGNN在此范式的基础上上引入了基于voxel的采样；</li>
+<li>PointFormer在此范式的基础上引入了坐标细化(coordinate refinement);</li>
+</ul></div>
+</li>
+<li>
+<p class="component-content component">特征学习：很多文章在PointNet的基础上进行抽象设置(set abstraction)来学习特征, 通常先通过预定义半径的球查询(ball query)来搜集上下文点(context points), 然后使用多层感知机和最大池化将上下文点和特征进行聚合来获得新的特征。此外还有很多不同的点云算子，比如：</p>
+<div class="component-content component"><ul>
+<li>图算子(graph operators):  如Point-GNN， PointRGCN, StarNet, SVGA-Net,</li>
+<li>注意力算子(attentional operators): 如Attentional PointNet;</li>
+<li>Transformer: 如Pointformer</li>
+</ul></div>
+</li>
+</ol></div>
+<p class="component-content component">涉及到上述方法的文章有：</p>
+<div class="component-content component"><ul>
+<li>
+<p class="component-content component">PointRCNN: 3D Object Proposal Generation and Detection From Point Cloud(<a href="https://www.aminer.cn/profile/xiaogang-wang/5a28a3b39ed5db70fba3ff6c">
+,Xiaogang Wang</a>, <a href="https://www.aminer.cn/profile/hongsheng-li/53f46582dabfaee2a1dab2ad">Hongsheng Li</a>, cite1300, 2019)</p>
+</li>
+<li>
+<p class="component-content component">IPOD: Intensive Point-based Object Detector for Point Cloud(<a href="https://www.aminer.cn/profile/jiaya-jia/561b16d045cedb3397ef06c0">Jiaya Jia</a>, cite100, 2018)</p>
+</li>
+<li>
+<p class="component-content component">STD: Sparse-to-Dense 3D Object Detector for Point Cloud(<a href="https://www.aminer.cn/profile/jiaya-jia/561b16d045cedb3397ef06c0">Jiaya Jia</a>, cite500, 2019)</p>
+</li>
+<li>
+<p class="component-content component">3DSSD: Point-based 3D Single Stage Object Detector(<a href="https://www.aminer.cn/profile/jiaya-jia/561b16d045cedb3397ef06c0">Jiaya Jia</a>, cite400, 2020)</p>
+</li>
+<li>
+<p class="component-content component">Point-GNN: Graph Neural Network for 3D Object Detection in a Point Cloud(Raj Rajkumar, cite400, 2020)</p>
+</li>
+<li>
+<p class="component-content component">StarNet: Targeted Computation for Object Detection in Point Clouds(<a href="https://www.aminer.cn/profile/shlens-jonathon/53f4376fdabfaedd74da9d91">
+Shlens Jonathon</a>, <a href="https://www.aminer.cn/profile/chen-zhifeng/5d415bc57390bff0db709334">Zhifeng Chen</a>, cite70, 2019)</p>
+</li>
+<li>
+<p class="component-content component">3D Object Detection with Pointformer(<a href="https://www.aminer.cn/profile/li-erran-li/53f43999dabfaefedbae66d1">Li Li(Erran)</a>, <a href="https://www.aminer.cn/profile/gao-huang/540835d9dabfae44f0870362">Gao Huang</a>, cite120, 2021)</p>
+</li>
+<li>
+<p class="component-content component">Joint 3d instance segmentation and object detection for autonomous driving(<a href="https://www.aminer.cn/profile/ruigang-yang/562ffb0f45cedb33998a4b22">Ruigang Yang</a>, cite60, 2020)</p>
+</li>
+<li>
+<p class="component-content component">3d-centernet: 3d object detection network for point clouds with center estimation priority(Qi Wang, cite10, 2021)</p>
+</li>
+<li>
+<p class="component-content component">PointRGCN: Graph Convolution Networks for 3D Vehicles Detection Refinement(Ghanem Bernard, cite3, 2019)</p>
+</li>
+<li>
+<p class="component-content component">SVGA-Net: Sparse Voxel-Graph Attention Network for 3D Object Detection from Point Clouds(Zeng Bing, cite30, 2022)</p>
+</li>
+<li>
+<p class="component-content component">Relation Graph Network for 3D Object Detection in Point Clouds(Mian Ajmal, cite30, 2021)</p>
+</li>
+<li>
+<p class="component-content component">Attentional PointNet for 3D-Object Detection in Point Clouds(Christian Wolf, cite30, 2019)</p>
+</li>
+</ul></div>
+<p class="component-content component">对上述典型方法的分类如下表所示：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-dbfc0ae0756b3701d9053f57e1f1c662" id="lhtdbfc0ae0756b3701d9053f57e1f1c662">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rMSfyaXBK4" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h3 id="基于点云的3d检测方法总结" class="pagebody-header">
+    基于点云的3D检测方法总结
+  </h3>
+</div><p class="component-content component">基于点云的3D检测方法效果主要受三个方面制约：</p>
+<div class="component-content component"><ol>
+<li>
+<p class="component-content component">上下文点(context point)的数量：增加上下文点的数量会获得更多的信息，但是会占用更多存储空间；</p>
+</li>
+<li>
+<p class="component-content component">特征学习过程中设置的上下文查询半径：查询半径过小会倒是上下文信息不足，半径过大会导致细粒度信息缺失；</p>
+<p class="component-content component">上下文点的数量和查询半径是需要仔细权衡的两个关键因素，这两个因素会显著影响检测模型的效率和精度。</p>
+</li>
+<li>
+<p class="component-content component">点云采样方法是基于点云的3D检测算法的瓶颈，不同的采样方法特点不同：</p>
+<div class="component-content component"><ul>
+<li>随机均匀采样可以高效并行进行，但是会导致近处的点云过采样，远处的点云欠采样；</li>
+<li>FPS(Furthest point sampling)在近远点的采样平衡性会更好，但是无法并发进行，不适合实时场景；</li>
+</ul></div>
+</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h2 id="基于将点云划分为grid的方法" class="pagebody-header">
+    基于将点云划分为grid的方法
+  </h2>
+</div><p class="component-content component">基于grid的数据表示形式有3种：分别是voxel, pillars, BEV。下面分别介绍各类方法：</p>
+
+<div class="component-content pagebody component">
+  <h3 id="1-voxels" class="pagebody-header">
+    1. voxels:
+  </h3>
+</div><p class="component-content component">voxel是3D立方体，每个立方体内包含点云。通过voxelization可以很容易将点云转换为voxels。因为点云分布是稀疏的，所以很多voxel里面是空的，没有任何点云。实际应用种，只会存储非空的voxel，然后从非空的voxel中提取特征。首次提出voxel概念的文章：VoxelNet: End-to-End Learning for Point Cloud Based 3D Object Detection(<a href="https://www.aminer.cn/profile/oncel-tuzel/53f47b73dabfaee4dc89e681">Oncel Tuzel</a>,  cite2000, 2017)</p>
+<p class="component-content component">类似voxel表示形式的文章：</p>
+<div class="component-content component"><ul>
+<li>Class-balanced Grouping and Sampling for Point Cloud 3D Object Detection(Yu Gang, cite0, 2019)</li>
+<li>AFDet: Anchor Free One Stage 3D Object Detection(Li Huang, cite60, 2020)</li>
+<li>Center-based 3D Object Detection and Tracking(<a href="https://www.aminer.cn/profile/philipp-kr-henb-hl/53f4589ddabfaedd74e36b9a">Philipp Krähenbühl</a>, cite350, 2021)</li>
+<li>Object DGCNN: 3D Object Detection using Dynamic Graphs(Justin Solomon, cite20, 2021)</li>
+<li>CIA-SSD: Confident IoU-Aware Single-Stage Object Detector From Point Cloud(Chi-Wing Fu, cite100, 2021)</li>
+<li>Voxel R-CNN: Towards High Performance Voxel-based 3D Object Detection(Yanyong Zhang, cite200, 2021)</li>
+<li>From Points to Parts: 3D Object Detection from Point Cloud with Part-aware and Part-aggregation Network(<a href="https://www.aminer.cn/profile/hongsheng-li/53f46582dabfaee2a1dab2ad">Hongsheng Li</a>, cite400, 2021)</li>
+</ul></div>
+<p class="component-content component">此外还有多视角的voxel方法：从range视图、圆柱视图、球状视图、感知视图、BEV视图等多种视图动态voxelization和融合的机制来生成voxel，代表性方法有：</p>
+<div class="component-content component"><ul>
+<li>End-to-End Multi-View Fusion for 3D Object Detection in LiDAR Point Clouds(<a href="https://www.aminer.cn/profile/anguelov-dragomir/53f43947dabfaedce554a66b">Anguelov Dragomir</a>， cite200, 2019)</li>
+<li>Every View Counts: Cross-View Consistency in 3D Object Detection with Hybrid-Cylindrical-Spherical Voxelization(Qi Chen, cite40, 2020)</li>
+<li>VISTA: Boosting 3D Object Detection via Dual Cross-VIew SpaTial Attention(Kui jia, cite10, 2022)</li>
+</ul></div>
+<p class="component-content component">还有多尺度的voxel方法：voxel的尺寸不同，代表文章有：</p>
+<div class="component-content component"><ul>
+<li>HVNet: Hybrid Voxel Network for LiDAR Based 3D Object Detection(Ye Maosheng, cite100, 2020)</li>
+<li>Reconfigurable Voxels: A New Representation for LiDAR-Based Point Clouds(<a href="https://www.aminer.cn/profile/lin-dahua/53f42cf2dabfaedce54bedd8">Lin Dahua</a>, cite0, 2020)</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h3 id="2-pillars" class="pagebody-header">
+    2. pillars:
+  </h3>
+</div><p class="component-content component">pillar可以看作是一种特殊的voxel, 它的垂直方向是无限大。先通过PointNet将点云聚合成pillar特征，然后分散后构成2D BEV图像，之后对2D图像进行特征提取。</p>
+<div class="component-content component"><ul>
+<li>首次提出pillar概念的文章：PointPillars: Fast Encoders for Object Detection from Point Clouds(Alex H Lang, cite1600, 2019)</li>
+<li>基于PointPillars的演进方法有：
+<div class="component-content component"><ul>
+<li>Pillar-Based Object Detection for Autonomous Driving(<a href="https://www.aminer.cn/profile/tom-funkhouser/53f438fddabfaeecd6977b07">Tom Funkhouser</a>, cite100, 2020)</li>
+<li>Embracing Single Stride 3D Object Detector with Sparse Transformer(Zhaoxiang Zhang, cite30, 2022)</li>
+</ul></div>
+</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h3 id="3-bev" class="pagebody-header">
+    3. BEV
+  </h3>
+</div><p class="component-content component">BEV特征地图(BEV feature map):  BEV特征图是种稠密的2D表示，每个像素对应一个特定的区域，并对该区域内的点信息进行编码。可以通过将voxel或pillar的3D特征映射到BEV或者通过统计像素区域内的点的信息来产生BEV特征图。基于BEV的3D检测方法有：</p>
+<div class="component-content component"><ul>
+<li>PIXOR: Real-time 3D Object Detection from Point Clouds(<a href="https://scholar.google.com/citations?user=jyxO2akAAAAJ&amp;hl=zh-CN&amp;oi=sra">R Urtasun</a>, cite700, 2018)</li>
+<li>HDNET: Exploiting HD Maps for 3D Object Detection(<a href="https://scholar.google.com/citations?user=jyxO2akAAAAJ&amp;hl=zh-CN&amp;oi=sra">R Urtasun</a>, cite200, 2018)</li>
+<li>RAD: Realtime and Accurate 3D Object Detection on Embedded Systems(Robert Laganiere, cite2, 2021)</li>
+<li>Multi-View 3D Object Detection Network for Autonomous Driving(Xiaozhi Chen, cite1800, 2016)</li>
+<li>BirdNet: A 3D Object Detection Framework from LiDAR Information(Barrera Alejandro, cite180, 2020)</li>
+<li>YOLO3D: End-to-end real-time 3D Oriented Object Bounding Box Detection from LiDAR Point Cloud(Waleed Ali, cite80, 2018)</li>
+<li>Complex-YOLO: An Euler-Region-Proposal for Real-time 3D Object Detection on Point Clouds(Horst-Michael Gross, cite200, 2018)</li>
+<li>Vehicle Detection from 3D Lidar Using Fully Convolutional Network(Bo Li, cite500, 2016)</li>
+</ul></div>
+<p class="component-content component">以上提到的基于grid的数据形式的3D检测方法分类如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-c68ff131cb1cda2e5a30fc4112050ed6" id="lhtc68ff131cb1cda2e5a30fc4112050ed6">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rTAq63nHFo" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h3 id="基于grid的lidar-3d检测算法总结" class="pagebody-header">
+    基于grid的lidar 3D检测算法总结
+  </h3>
+</div><div class="component-content component"><ol>
+<li>voxel携带更多深度信息，但是对应的计算和存储资源消耗更多；</li>
+<li>基于BEV特征图的方法速度快，但是检测精度比基于voxel的低；</li>
+<li>基于pillar的精度和效率介于BEV和voxel之间；</li>
+</ol></div>
+<p class="component-content component">基于grid方法面临的同一个问题是：如何选取一个合适的grid size？</p>
+<div class="component-content component"><ul>
+<li>grid size较小时，携带的信息粒度更精细，但是存储和计算量较大；</li>
+<li>grid size较大时，存储和计算效率高，但是检测精度较低；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h2 id="结合point和voxel的算法" class="pagebody-header">
+    结合point和voxel的算法
+  </h2>
+</div><p class="component-content component">point和voxel结合的检测方法的基本框架如下图所示：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-7caa5a8fac9aecdc4641125c0ac201b4" id="lht7caa5a8fac9aecdc4641125c0ac201b4">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rU2fsUE5fE" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+
+此类方法可分为两类：</p>
+<div class="component-content component"><ul>
+<li>one-stage方法：该方法通过point-voxel和voxel-point转换的方法在point和voxel之间建立关联；点云保留了细粒度的深度信息，voxel计算效率高，在特征提取阶段将二者结合。基于该思想的文章有：
+<div class="component-content component"><ul>
+<li>Point-Voxel CNN for Efficient 3D Deep Learning(<a href="https://www.aminer.cn/profile/song-han/542a5aeadabfae646d5557e9">Han Song</a>, cite300, 2019)</li>
+<li>Searching Efficient 3D Architectures with Sparse Point-Voxel Convolution(Han Song, cite200, 2020)</li>
+<li>Structure Aware Single-Stage 3D Object Detection From Point Cloud(<a href="https://www.aminer.cn/profile/lei-zhang/53f4986fdabfaee0d9c74c66">Lei Zhang</a>, cite300, 2020)</li>
+<li>From Voxel to Point: IoU-guided 3D Object Detection for Point Cloud with Voxel-to-Point Decoder(Ling Shao, cite10, 2021)</li>
+<li>From Multi-View to Hollow-3D: Hallucinated Hollow-3D R-CNN for 3D Object Detection(<a href="">Yanyong Zhang</a>, cite10, 2021)</li>
+<li>PVGNet: A Bottom-Up One-Stage 3D Object Detector with Integrated Multi-Level Features(Yang Wang, cite10, 2021)</li>
+<li>HVPR: Hybrid Voxel-Point Representation for Single-stage 3D Object Detection(Bumsub Ham, cite20, 2021)</li>
+<li>M3DeTR: Multi-representation, Multi-scale, Mutual-relation 3D Object Detection with Transformers(
+<a href="">Larry Davis</a>, <a href="https://www.aminer.cn/profile/dinesh-manocha/53f4b7d7dabfaed4ae77b475">Dinesh Manocha</a>, cite3, 2022)</li>
+</ul></div>
+</li>
+<li>two-stage方法：每个阶段使用的数据形式不同，一般来说，第一阶段使用基于voxel的框架产生一系列3D proposal；第二阶段从点云中采样关键点，然后使用特定的point算子从关键点中细化3Dproposal。代表文章有：
+<div class="component-content component"><ul>
+<li>PV-RCNN: Point-Voxel Feature Set Abstraction for 3D Object Detection(<a href="">Hongsheng Li</a>, cite800, 2020)</li>
+<li>Fast Point R-CNN(<a href="">Jiaya Jia</a>, cite200, 2019)</li>
+<li>PV-RCNN++: Point-Voxel Feature Set Abstraction With Local Vector Representation for 3D Object Detection(<a href="">Hongsheng Li</a>, cite50, 2021)</li>
+<li>InfoFocus: 3D Object Detection for Autonomous Driving with Dynamic Information Modeling(<a href="https://www.aminer.cn/profile/larry-s-davis/53f49c81dabfaee1c0badc66">Larry S. Davis</a>, cite20, 2020)</li>
+<li>LiDAR R-CNN: An Efficient and Universal 3D Object Detector(Zhihao Li, cite50, 2021)</li>
+<li>Pyramid R-CNN: Towards Better Performance and Adaptability for 3D Object Detection(<a href="">Xiaodan Liang</a>, cite40, 2021)</li>
+<li>Improving 3D Object Detection With Channel-Wise Transformer(XianSheng Hua, cite40, 2021)</li>
+<li>Point Density-Aware Voxels for LiDAR 3D Object Detection(Steven Waslander, cite10, 2022)</li>
+</ul></div>
+</li>
+</ul></div>
+<p class="component-content component">以上提到的各种方法的分类情况如下：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-b84e73ce1fa3f8e4ea6a556f42d1899e" id="lhtb84e73ce1fa3f8e4ea6a556f42d1899e">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rUcgNtHRT7" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h3 id="point-voxel结合方法的总结" class="pagebody-header">
+    point-voxel结合方法的总结
+  </h3>
+</div><p class="component-content component">此类方法的检测精度比纯voxel的高，但是计算成本和难度增加，point-voxel的关联耗时且不准确，同时点云特征和3D proposal的配合也难度较大。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="基于range的3d检测" class="pagebody-header">
+    基于range的3D检测
+  </h2>
+</div><p class="component-content component">range图像是一种稠密的2D表示，每个像素携带了距离信息，而不是RBG信息。基于range图像的3D检测方法主要从两个方面来完成3D目标检测任务：</p>
+<div class="component-content component"><ol>
+<li>设计专用于range图像的模型和算子；</li>
+<li>选择合适的view；</li>
+</ol></div>
+<p class="component-content component">基于range图像的3D检测框架如下图所示：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-67d4ab8caa3462435b6e94d1c82b4e3b" id="lht67d4ab8caa3462435b6e94d1c82b4e3b">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rWAhtai3oO" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h3 id="基于range的模型" class="pagebody-header">
+    基于range的模型
+  </h3>
+</div><p class="component-content component">因为range和普通camera的图像都是2D的，所以常将2D检测模型移植到range图像上。</p>
+<div class="component-content component"><ul>
+<li>开创性的工作：LaserNet，使用DLA-Net(deep layer aggregation network)来获得多尺度的特征，并从range图像中检测3D目标， 论文题目：LaserNet: An Efficient Probabilistic 3D Object Detector for Autonomous Driving(Gregory P. Meyer, cite200, 2019)</li>
+<li>演进工作：
+<div class="component-content component"><ul>
+<li>RangeRCNN: Towards Fast and Accurate 3D Object Detection with Range Image Representation（Zhidong Liang, cite40, 2020）</li>
+<li>RSN: Range Sparse Net for Efficient, Accurate LiDAR 3D Object Detection(<a href="">Drago Anguelov</a>, cite50, 2021)</li>
+<li>Range Conditioned Dilated Convolutions for Scale Invariant 3D Object Detection(<a href="">Drago Anguelov</a>, cite20, 2020)</li>
+<li>RangeIoUDet: Range Image based Real-Time 3D Object Detector Optimized by Intersection over Union(Zhidong Liang, cite20, 2021)</li>
+<li>RangeDet: In Defense of Range View for LiDAR-Based 3D Object Detection(Zhaoxiang Zhang, cite60, 2021)</li>
+</ul></div>
+</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h3 id="基于range的算子" class="pagebody-header">
+    基于range的算子
+  </h3>
+</div><p class="component-content component">由于range图像和RGB图像中每个像素携带的信息不同，所以使用的算子也不同。一些方法通过改善算子来提高特征提取的效率和精度，代表性方法如下：</p>
+<div class="component-content component"><ul>
+<li>Range Conditioned Dilated Convolutions for Scale Invariant 3D Object Detection(<a href="">Anguelov Dragomir</a>, cite30, 2020)</li>
+<li>To the Point: Efficient 3D Object Detection in the Range Image with Graph Convolution Kernels(<a href="">Anguelov Dragomir</a>, cite20, 2021)</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h3 id="基于range-view的方法" class="pagebody-header">
+    基于range view的方法
+  </h3>
+</div><p class="component-content component">range图像是由点云进行球状映射得到的，基于range视角的检测会存在遮挡和比例尺变化的情况。为解决此问题，很多文章尝试从其他view来进行3D检测，代表性方法有：</p>
+<div class="component-content component"><ul>
+<li>It&rsquo;s All Around You: Range-Guided Cylindrical Network for 3D Object Detection(Dan Raviv, cite20, 2021)</li>
+</ul></div>
+<p class="component-content component">以上提到的各方法的分类如下：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-f959695bff0923da3f3b20e6fd763017" id="lhtf959695bff0923da3f3b20e6fd763017">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rWWZLYaV1c" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h3 id="关于range-3d检测方法的总结" class="pagebody-header">
+    <strong>关于range 3D检测方法的总结</strong>
+  </h3>
+</div><p class="component-content component">基于range的检测方法效率高，但是容易受遮挡和尺度变化影响。
+因此，当前流行的基于range的范式是从range中进行特征提取，从BEV进行3D检测。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="基于anchor的lidar-3d检测" class="pagebody-header">
+    基于anchor的lidar 3D检测
+  </h2>
+</div><div class="component-content component"><ol>
+<li>3D目标比较小；</li>
+<li>点云稀疏，难以检测和3D目标尺寸估计；</li>
+</ol></div>
+<p class="component-content component">anchor是预定义尺寸的长方体，可被置于3D空间的任意位置。
+假设ground truth为$[x^g, y^g, z^g, l^g, w^g, h^g, \theta^g], cls^g$;
+anchor为$[x^a, y^a, z^a, l^a, w^a, h^a, \theta^a]$;
+由anchor预测得到3D检测框$[x, y, z, l, w, h, \theta]$.
+基于anchor的3D检测基本流程如下图所示：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-5831a6e638a2eb82ad5537c2a8a4c1fc" id="lht5831a6e638a2eb82ad5537c2a8a4c1fc">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rZcJOgr6sT" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">我们从两个方面来介绍基于anchor的解决上述问题的技术：</p>
+<div class="component-content component"><ol>
+<li>
+<p class="component-content component">anchor的配置：基于anchor的3D检测方法基本都基于BEV,3Danchor放置于BEV特征图中每个grid中，并且每个类别的anchor都有固定的尺寸；</p>
+<p class="component-content component"><strong>问题：每个类别固定尺寸的anchor是否合理？</strong></p>
+</li>
+<li>
+<p class="component-content component">损失函数：$L_{det} = L_{cls} + L_{reg} + L_{\theta}$, 其中：</p>
+<div class="component-content component"><ul>
+<li>$L_{cls}$是positive anchor和negative anchor的分类回归损失；</li>
+<li>$L_{reg}$是3D尺寸和位置的损失函数；</li>
+<li>$L_{\theta}$是heading的损失函数；</li>
+</ul></div>
+<p class="component-content component">voxelNet是第一个将3D IOU和损失函数结合起来的文章，之后还有基于focal loss的方法，基于SmoothL1的方法，基于corner loss的方法等。</p>
+</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h3 id="基于anchor检测方法的挑战" class="pagebody-header">
+    基于anchor检测方法的挑战
+  </h3>
+</div><div class="component-content component"><ol>
+<li>
+<p class="component-content component">对于小目标，使用anchor难度大；</p>
+</li>
+<li>
+<p class="component-content component">grid大时，anchor一般也大， 如果目标小则iou小；</p>
+</li>
+<li>
+<p class="component-content component">实际应用中，需要的anchor数量太多；</p>
+</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h2 id="anchor-free的3d目标检测" class="pagebody-header">
+    anchor-free的3D目标检测
+  </h2>
+</div><p class="component-content component">anchor-free的检测方法不需要设计复杂的anchor机制，可以灵活应用于BEV, point view, range view等多种视图。基于anchor-free的3D检测基本流程如下图所示：
+
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-7196535f4aae3b3b9ca130d93f4292e1" id="lht7196535f4aae3b3b9ca130d93f4292e1">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://s.readpaper.com/T/1rZcrTCCh5U" alt="image.png"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image.png
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">anchor-free和anchor-based检测方法的根本区别在于正样本和负样本的选择上。
+anchor-based方法基于IOU来决定正负样本；
+anchor-free方法使用各种各样基于grid的assignment策略，这些策略适用于grid cell, pillars, voxels.</p>
+<div class="component-content component"><ol>
+<li>
+<p class="component-content component">基于grid的anchor-free方法：
+PIXOR是使用grid cell来决定正负采样的先驱：grid cell在ground truth里就是正样本，否则就是负样本。
+基于PIXOR的演进方法有：</p>
+<div class="component-content component"><ul>
+<li>Pillar-based Object Detection for Autonomous Driving；</li>
+<li>AFDet;</li>
+<li>AFDetV2;</li>
+<li>Object as Hotspots</li>
+<li>Center-based 3D Object Detection and Tracking</li>
+</ul></div>
+</li>
+<li>
+<p class="component-content component">基于point的anchor-free方法：
+基于point的3D检测方法大多采用基于point的anchor-free策略，先将point分段，然后将3D框内部或附近的前景点作为正样本，然后从这些前景点中学习3D检测框。采用这种方法的代表性文章有：</p>
+<div class="component-content component"><ul>
+<li>PointRCNN;</li>
+<li>3DSSD;</li>
+<li>IPOD;</li>
+<li>3D Object Detection with Pointformer;</li>
+</ul></div>
+</li>
+<li>
+<p class="component-content component">基于range的anchor-free方法：</p>
+<p class="component-content component">基于range的anchor-free方法通常做法是：将3D目标内部的range像素作为正样本，此外不同于其他方法采用基于全局坐标的3D框回归，基于range的3D框回归使用的是以目标为中心(object-centric)的坐标。代表性方法有：</p>
+<div class="component-content component"><ul>
+<li>LaserNet;</li>
+<li>RangeDet;</li>
+</ul></div>
+</li>
+<li>
+<p class="component-content component">集合到集合的anchor-free方法(set-to-set assignment)：
+DETR的set-to-set assignment方法影响深远，通过匈牙利算法自动将预测结果和ground truth关联起来。基于set-to-set的代表性文章有：</p>
+<div class="component-content component"><ul>
+<li>An End-to-End Transformer Model for 3D Object Detection</li>
+<li>Object DGCNN: 3D Object Detection using Dynamic Graphs</li>
+<li>Point2Seq: Detecting 3D Objects as Sequences</li>
+</ul></div>
+</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h3 id="关于anchor-free方法的总结" class="pagebody-header">
+    关于anchor-free方法的总结
+  </h3>
+</div><p class="component-content component">anchor-free方法灵活简单，各种anchor-free方法中，最具潜力的方法是center-based方法：Center-based 3D Object Detection and Tracking，其在小目标领域表现良好，并且超过anchor-based基线。
+anchor-free方法的难点在于，需要设计一个准确的过滤机制，将bad positive样本过滤掉。在这个问题上，anchor-based方法只需要计算iou，设置iou阈值即可。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="通过辅助手段来改善3d检测的方法" class="pagebody-header">
+    通过辅助手段来改善3D检测的方法
+  </h2>
+</div><p class="component-content component">很多种方法都在尝试通过辅助工作来加强空间特征，以及为精确的3D检测提供辅助支持。常用的辅助工作包括：</p>
+<div class="component-content component"><ol>
+<li>语义分割：语义分割可以从以下3个方面对3D检测提供帮助：
+<div class="component-content component"><ol>
+<li>前景分割：可以提供目标位置的潜在信息，应用该方法的文章有：
+<div class="component-content component"><ul>
+<li>PointRCNN;</li>
+<li>Joint 3D Instance Segmentation and Object Detection for Autonomous Driving</li>
+<li>STD: Sparse-to-Dense 3D Object Detector for Point Cloud</li>
+<li>Structure Aware Single-Stage 3D Object Detection From Point Cloud</li>
+</ul></div>
+</li>
+<li>采用语义分割可以加强空间信息：</li>
+<li>可以将语义分割作为预处理手段，过滤背景样本，提高检测效率。采用此方法的文章有：
+<div class="component-content component"><ul>
+<li>IPOD；</li>
+<li>RSN；</li>
+</ul></div>
+</li>
+</ol></div>
+</li>
+<li>IOU预测：IOU可以作为一个有效的监督手段来纠正目标置信度。采用IOU辅助手段的文章有：
+<div class="component-content component"><ul>
+<li>CIA-SSD：为每个检测到的3D目标计算IOU置信度$S_{iou}$ ,然后使用此置信度纠正推理结果，最终的置信度计算公式为$S_{conf} = S_{cls} * (S_{iou})^{\beta}$;</li>
+<li>SE-SSD;</li>
+<li>RangeIoUDet;</li>
+<li>AFDet;</li>
+<li>AFDetV2;</li>
+</ul></div>
+</li>
+<li>目标形状补全：由于lidar的物理特性，导致远处的目标感知到的点云稀疏，形状不完整。解决此问题的一个直观方法是从稀疏点云中补全目标形状，进而得到精确和鲁棒的检测结果。关于目标补全技术的文章有：
+<div class="component-content component"><ul>
+<li>DOPS: Learning to Detect 3D Objects and Predict their 3D Shapes(<a href="https://www.aminer.cn/profile/funkhouser-thomas/53f438fddabfaeecd6977b07">Funkhouser Thomas</a>, cite30, 2020)</li>
+<li>SSN;</li>
+<li>SPG: Unsupervised Domain Adaptation for 3D Object Detection via Semantic Point Generation(<a href="">Dragomir Anguelov</a>, cite30, 2021)</li>
+<li>Behind the Curtain: Learning Occluded Shapes for 3D Object Detection(Qiangeng Xu, cite10, 2021)</li>
+<li>Point Density-Aware Voxels for LiDAR 3D Object Detection</li>
+<li>GLENet: Boosting 3D Object Detectors with Generative Label Uncertainty Estimation</li>
+</ul></div>
+</li>
+<li>目标局部预测：获取目标的局部信息有利于3D检测，相关的文章有：
+<div class="component-content component"><ul>
+<li>Object as Hotspots：</li>
+<li>From Points to Parts</li>
+</ul></div>
+</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h3 id="关于3d检测辅助手段的总结" class="pagebody-header">
+    关于3D检测辅助手段的总结
+  </h3>
+</div><p class="component-content component">还有很多辅助手段来提高检测精度，比如场景流估计(scene flow estimation)等。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="基于lidar的3d检测算法展望" class="pagebody-header">
+    基于LiDAR的3D检测算法展望
+  </h2>
+</div><p class="component-content component">基于LiDAR的3D检测算法近年来取得极大进展代表性进展如下：</p>
+<div class="component-content component"><ul>
+<li>基于pillar的算法运算速度非常快，可达60Hz以上；</li>
+<li>基于voxel和point结合的方法精度很高，比如PV-RCNN系列在KITTI上对car easy样本的AP达到90.25%；</li>
+<li>SE-SSD对KITTI的car easy样本的AP达到91.49%；</li>
+<li>基于点云补全的方法GLENet在KITTI上对car easy的AP达到91.67%；</li>
+<li>基于Transformer的方法DSVT在Waymo上对vehicle L1的样本的mAP达到80.3；</li>
+</ul></div>
+<p class="component-content component">这些方法都有各自的优点，总的来说，这些算法的演进方向符合如下节奏：</p>
+<div class="component-content component"><ol>
+<li>2016-2019年间，学者们在研究如何高效提取点云信息，发展出各种框架，如VoxelNet类、PointPillars类、PointNet类的算法；</li>
+<li>2020-2021年间，学者们试图将RCNN、voxel、point的优点结合，比如PV-RCNN、M3DeTR等方法；</li>
+<li>2021-2023年间，进入百花齐放阶段：
+<div class="component-content component"><ul>
+<li>有尝试将Transformer应用于LiDAR 3D检测的，比如CT3D/VoTr/DSVT等；</li>
+<li>有尝试对输入点云做增强的方法，比如PDA/BtcDet/GLENet等；</li>
+<li>有将目标检测转换为序列解码的方法，比如Point2Seq;</li>
+<li>有尝试多模融合的方法，比如3D-Dual Fusion；</li>
+</ul></div>
+</li>
+</ol></div>
+<p class="component-content component">对于未来的技术演进路线，可能会是当前探索到的多种有效方法的结合，比如将点云增强应用于Transformer检测结构、比如多模融合技术与多种数据形式的技术结合；也可能某一单点技术会有更突破性的进展，比如基于Transformer的检测方法。</p>
+<p class="component-content component">总的来说，经过最近几年的技术积累和技术探索，接下来将会涌现出更具竞争力、更具统治力的检测算法。</p>
+
+          </div>
+          
+          <div class="component">
+            <div class="component-content">
+              <div class="article-copyright">
+                <p class="content">
+                  Copyright: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed" target="_blank">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</a>
+                </p>
+                <p class="content">Author:  jk049 </p>
+                <p class="content">Posted on:  December 27, 2022</p>
+              </div>
+            </div>
+          </div>
+          
+        </article>
+      </section>
+  </main>
+
+  <script>
+    var script = document.createElement("script");script.src = "https://jk049.github.io/js/initPost.js";
+    document.head.appendChild(script);
+  </script>
+
+    
+    <div class="footer-main ">
+  <div class="content-body footer-wraper">
+    <div class="footer-box">
+      <div class="foot-nav">
+        <div class="foot-nav-items">
+          <div class="item">
+            <div class="logo"></div>
+            <div class="email">Email: <a href="mailto:floyd.li@outlook.com">floyd.li@outlook.com</a></div>
+          </div>
+
+          <div class="item community">
+            <div class="item-title">Social Media</div>
+            
+              <a href="https://github.com/floyd-li" target="_blank">Github</a>
+            
+              <a href="https://twitter.com/some-one" target="_blank">Twitter</a>
+            
+          </div>
+
+          <div class="item resources">
+            <div class="item-title">Related</div>
+            
+              <a href="https://yufengbiji.com/" target="_blank">驭风笔记</a>
+            
+              <a href="https://apple.com/" target="_blank">Apple</a>
+            
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="item copyright">
+          &copy; 2023
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> & <a href="https://github.com/floyd-li/hugo-theme-itheme" target="_blank">iTheme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+    
+    
+
+    
+    
+</html>

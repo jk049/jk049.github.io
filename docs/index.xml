@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>jk049&#39;s blog</title>
+    <link>https://jk049.github.io/</link>
+    <description>Recent content on jk049&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>Floyd Li</copyright>
+    <lastBuildDate>Mon, 20 Mar 2023 13:06:38 +0800</lastBuildDate><atom:link href="https://jk049.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Markdown Syntax Example</title>
+      <link>https://jk049.github.io/posts/mark-down-syntax/</link>
+      <pubDate>Mon, 20 Mar 2023 13:06:38 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/mark-down-syntax/</guid>
+      <description>Headings# H1 ## H2 ### H3 #### H4 ##### H5 ###### H6H1H2H3H4H5H6ImageImage - Wide ![Image Wide|wide](https://www.apple.com.cn/newsroom/images/apple-logo_black.jpg.landing-regular_2x.jpg) Image - Big ![Image Big|big](https://www.apple.com.cn/newsroom/images/apple-logo_black.jpg.landing-regular_2x.jpg) Image - Inline ![Image Inline|inline](https://www.apple.com.cn/newsroom/images/apple-logo_black.jpg.landing-regular_2x.jpg)Image WideImage BigImage InlineBlock Quotes&amp;gt; You are young and life is long - Pink FloydYou are young and life is long - Pink Floyd
+Code Blocks```javascript function say() { const greeting = &amp;#34;I&amp;#39;ll see you on the dark side of the moon&amp;#34;; console.</description>
+    </item>
+    
+    <item>
+      <title>Apple 推出新款 HomePod，带来突破性音质与智能体验</title>
+      <link>https://jk049.github.io/posts/apple-introduces-the-new-homepod-with-breakthrough-sound-and-intelligence/</link>
+      <pubDate>Mon, 27 Feb 2023 13:06:38 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/apple-introduces-the-new-homepod-with-breakthrough-sound-and-intelligence/</guid>
+      <description>HomePod 汇集了多项 Apple 创新技术、Siri 智能和智能家居功能，为用户带来前所未有的聆听体验。 加利福尼亚州，库比提诺Apple 今日宣布推出 HomePod</description>
+    </item>
+    
+    <item>
+      <title>2023年VR游戏周即将到来！</title>
+      <link>https://jk049.github.io/posts/vr-games-week-2023-starts-next-week/</link>
+      <pubDate>Tue, 27 Dec 2022 13:06:38 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/vr-games-week-2023-starts-next-week/</guid>
+      <description>PlayStation VR2即将于下周发布。为表庆祝，我们准备介绍数部即将登陆此平台的虚幻引擎VR游戏，以及一些准备登陆Meta Quest、PCVR等平台的虚幻</description>
+    </item>
+    
+    <item>
+      <title>毕业第一年：从学生向3D美术师的转变</title>
+      <link>https://jk049.github.io/posts/the-first-year-out-moving-from-student-to-3d-artist/</link>
+      <pubDate>Wed, 07 Dec 2022 13:06:38 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/the-first-year-out-moving-from-student-to-3d-artist/</guid>
+      <description>我们都知道，无论哪个领域，离开学校进入职场的感觉有多么令人生畏。你具备合适的技能吗？你学到的技术能在你获得的工作中发挥作用吗？这足以让你夜不</description>
+    </item>
+    
+    <item>
+      <title>虚幻引擎5.1带来电影、广播、动画和实况活动新功能</title>
+      <link>https://jk049.github.io/posts/unreal-engine-5-1-delivers-new-features-for-filmmaking-broadcast-animation-and-live-events/</link>
+      <pubDate>Sat, 12 Nov 2022 13:06:38 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/unreal-engine-5-1-delivers-new-features-for-filmmaking-broadcast-animation-and-live-events/</guid>
+      <description>随着虚幻引擎5.1的发布，它所带来的改进将使所有行业的创作者受益。在这篇博文中，我们将特别关注真人与动画影视内容（包括虚拟制片和LED舞台项</description>
+    </item>
+    
+    <item>
+      <title>关于我们</title>
+      <link>https://jk049.github.io/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://jk049.github.io/about/</guid>
+      <description>苹果公司（英语：Apple Inc.），原称苹果电脑公司（英语：Apple Computer, Inc.），是源自美国的跨国科技公司，总部位于美国加州的库比蒂诺，</description>
+    </item>
+    
+  </channel>
+</rss>

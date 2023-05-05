@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="js no-touch  progressive-image  no-reduced-motion progressive" lang="en">
+  <head>
+    <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="/img/favicon.ico">
+
+    <meta name="keyword" content="">
+
+    <title>Tags</title>
+
+    <link rel="canonical" href="/tags/">
+
+    <link rel="stylesheet" href="/css/global.css">
+
+    <link rel="stylesheet" href="/css/custom.css">
+
+    <link rel="stylesheet" href="/css/search.css" />
+
+    
+    
+
+    
+    
+
+</head>
+  </head>
+  <body class=" page-landing   ">
+    <header>
+      <nav class="nav">
+  <div class="nav-wrapper">
+    <div class="nav-content-wrapper">
+      <div class="nav-content">
+        <a href="/ " class="nav-title">jk049&#39;s blog</a>
+        <div class="nav-menu">
+          <div class="nav-item-wrapper">
+            <a href="/posts " class="nav-item-content">Articles</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/about" class="nav-item-content">About</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/index.xml" class="nav-item-content" target="_blank">RSS</a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleSearchModal(){
+    const template = `
+    <div class="modal-body">
+      <div id="autocomplete" onclick="event.stopPropagation();"></div>
+    </div>
+    `
+    const modal = document.querySelector("#modal-wrapper")
+    if(!modal){
+      const div = document.createElement("div")
+      document.body.setAttribute("style","overflow: hidden;")
+      div.setAttribute("id", "modal-wrapper")
+      div.setAttribute("onclick", "toggleSearchModal()")
+      div.innerHTML = template
+      const script = document.createElement("script");script.setAttribute("src", "https://jk049.github.io/js/algolia.js")
+      div.appendChild(script)
+      document.body.append(div)
+    } else {
+      document.body.removeAttribute("style")
+      document.body.removeChild(modal)
+    }
+  }
+</script>
+    </header>
+    
+<div class="results">
+    <div class="results__content">
+      <div class="result" role="group">
+        <h2 class="result__title">“All Tags”</h2>
+        <div class="tags-list">
+          
+          <a href="/tags/markdown">markdown (1) </a>
+          
+          <a href="/tags/apple">Apple (1) </a>
+          
+          <a href="/tags/homepod">HomePod (1) </a>
+          
+          <a href="/tags/%E6%96%B0%E9%97%BB%E7%A8%BF">新闻稿 (2) </a>
+          
+          <a href="/tags/%E5%8A%9F%E8%83%BD">功能 (2) </a>
+          
+          <a href="/tags/%E5%8A%A8%E7%94%BB">动画 (2) </a>
+          
+          <a href="/tags/%E5%B9%BF%E6%92%AD%E4%B8%8E%E5%AE%9E%E5%86%B5">广播与实况 (2) </a>
+          
+          <a href="/tags/%E8%99%9A%E5%B9%BB%E5%BC%95%E6%93%8E">虚幻引擎 (2) </a>
+          
+          <a href="/tags/3d">3d (1) </a>
+          
+          <a href="/tags/%E5%BD%B1%E8%A7%86">影视 (1) </a>
+          
+          <a href="/tags/%E6%95%99%E8%82%B2">教育 (1) </a>
+          
+          <a href="/tags/%E6%B8%B8%E6%88%8F">游戏 (1) </a>
+          
+          <a href="/tags/%E7%89%B9%E5%86%99">特写 (1) </a>
+          
+        </div>
+      </div>
+    </div>
+</div>
+
+
+    
+    <div class="footer-main ">
+  <div class="content-body footer-wraper">
+    <div class="footer-box">
+      <div class="foot-nav">
+        <div class="foot-nav-items">
+          <div class="item">
+            <div class="logo"></div>
+            <div class="email">Email: <a href="mailto:floyd.li@outlook.com">floyd.li@outlook.com</a></div>
+          </div>
+
+          <div class="item community">
+            <div class="item-title">Social Media</div>
+            
+              <a href="https://github.com/floyd-li" target="_blank">Github</a>
+            
+              <a href="https://twitter.com/some-one" target="_blank">Twitter</a>
+            
+          </div>
+
+          <div class="item resources">
+            <div class="item-title">Related</div>
+            
+              <a href="https://yufengbiji.com/" target="_blank">驭风笔记</a>
+            
+              <a href="https://apple.com/" target="_blank">Apple</a>
+            
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="item copyright">
+          &copy; 2023
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> & <a href="https://github.com/floyd-li/hugo-theme-itheme" target="_blank">iTheme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+    
+    
+
+    
+    
+</html>

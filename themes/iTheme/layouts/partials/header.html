@@ -1,0 +1,55 @@
+<nav class="nav">
+  <div class="nav-wrapper">
+    <div class="nav-content-wrapper">
+      <div class="nav-content">
+        <a href="{{ "" | relURL }} " class="nav-title">{{ .Site.Title }}</a>
+        <div class="nav-menu">
+          <div class="nav-item-wrapper">
+            <a href="{{ "posts" | relURL }} " class="nav-item-content">{{ i18n "posts" }}</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="{{ "about" | relURL }}" class="nav-item-content">{{ i18n "about" }}</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="{{ "index.xml" | relURL }}" class="nav-item-content" target="_blank">RSS</a>
+          </div>
+          {{ if site.Params.algolia.enabled }}
+          <div class="nav-item-wrapper">
+            <a href="#" onclick="toggleSearchModal()" class="nav-item-content">{{ i18n "search" }}</a>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleSearchModal(){
+    const template = `
+    <div class="modal-body">
+      <div id="autocomplete" onclick="event.stopPropagation();"></div>
+    </div>
+    `
+    const modal = document.querySelector("#modal-wrapper")
+    if(!modal){
+      const div = document.createElement("div")
+      document.body.setAttribute("style","overflow: hidden;")
+      div.setAttribute("id", "modal-wrapper")
+      div.setAttribute("onclick", "toggleSearchModal()")
+      div.innerHTML = template
+      const script = document.createElement("script");
+      {{- $js := resources.Get "js/algolia.js" -}}
+      {{- $opts := dict
+        "params" (dict "params" site.Params "baseURL" site.BaseURL)
+      -}}
+      {{- $js = $js | js.Build $opts -}}
+      script.setAttribute("src", {{ $js.Permalink }})
+      div.appendChild(script)
+      document.body.append(div)
+    } else {
+      document.body.removeAttribute("style")
+      document.body.removeChild(modal)
+    }
+  }
+</script>

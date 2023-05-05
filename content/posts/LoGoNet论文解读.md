@@ -5,7 +5,7 @@ description: "首次提出局部特征对齐及聚合的理念"
 draft: false
 author: "jk049"
 cover: "https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-18 221642.png"
-tags: ["3D", "LC Fusion", "local align"]
+tags: [“local align", 3D", "LC Fusion"]
 theme: "light"
 ---
 

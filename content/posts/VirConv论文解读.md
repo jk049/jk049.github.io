@@ -3,7 +3,7 @@ title: "VirConv论文解读"
 date: 2023-03-27T13:06:38+08:00
 description: "一个基于图像生成虚拟点云的LC融合框架，提出新的点云去冗余和特征聚合方法"
 author: "jk049"
-tags: ["虚拟点云", "LiDAR", "3D", "LC Fusion"]
+tags: ["虚拟点云","LiDAR","3D","LC Fusion"]
 theme: "light"
 featured: true
 cover: "https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 221101.png"

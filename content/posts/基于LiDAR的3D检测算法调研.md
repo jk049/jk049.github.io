@@ -4,7 +4,7 @@ date: '2022-12-27T13:06:38+08:00'
 description: '盘点2017年以来的典型3D检测算法'
 author: 'jk049'
 cover: 'https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 220504.png'
-tags: ["Lidar", "3D"]
+tags: [“review”,"Lidar","3D"]
 theme: 'light'
 ---
 

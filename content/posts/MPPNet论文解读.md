@@ -5,7 +5,7 @@ description: "MPPNet详细解读——从论文到代码"
 draft: false
 author: "jk049"
 cover: "https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 215731.png"
-tags: ["Lidar", "3D", "Sequence Detection"]
+tags: ["Sequence Detection","Lidar","3D"]
 theme: "light"
 ---
 

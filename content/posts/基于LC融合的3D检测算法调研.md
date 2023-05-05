@@ -4,7 +4,7 @@ date: '2022-12-07T13:06:38+08:00'
 description: '盘点近5年的LC融合3D检测典型算法'
 author: 'jk049'
 cover: 'https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 220855.png'
-tags: ["LC Fusion", "3D"]
+tags: [”review","LC Fusion","3D"]
 theme: 'light'
 
 ---

@@ -1,5 +1,5 @@
 ---
-title: "论文解读——MPPNet"
+title: "MPPNet论文解读"
 date: 2023-05-05T20:02:57+08:00
 description: "MPPNet详细解读——从论文到代码"
 draft: false

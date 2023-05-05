@@ -6,6 +6,7 @@ author: 'jk049'
 cover: 'https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 220855.png'
 tags: ["LC Fusion", "3D"]
 theme: 'light'
+
 ---
 
 # 基于LC融合的3D检测算法简介

@@ -7,7 +7,9 @@ tags: ["虚拟点云", "LiDAR", "3D", "LC Fusion"]
 theme: "light"
 featured: true
 cover: "https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 221101.png"
+
 ---
+
 # 摘要
 
 **问题背景**：最近基于虚拟point进行LC融合的方法引起人们关注，但是这种方法有两个重大缺点：

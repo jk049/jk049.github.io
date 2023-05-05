@@ -1,0 +1,176 @@
+---
+title: "VirConv论文解读"
+date: 2023-03-27T13:06:38+08:00
+description: "一个基于图像生成虚拟点云的LC融合框架，提出新的点云去冗余和特征聚合方法"
+author: "jk049"
+tags: ["虚拟点云", "LiDAR", "3D", "LC Fusion"]
+theme: "light"
+featured: true
+cover: "https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-19 221101.png"
+---
+# 摘要
+
+**问题背景**：最近基于虚拟point进行LC融合的方法引起人们关注，但是这种方法有两个重大缺点：
+
+- **计算量大**：基于图像产生的虚拟点云很稠密，导致计算量很大；
+- **噪声大**：产生的虚拟点云深度信息不准确，导致检测结果不准确；
+
+**本文设计**：为解决上述问题，本文提出VirConvNet(Virtual Sparse Convolution Network)，这是一个快速且有效的backbone, 该框架主要有两个关键设计：
+
+- StVD(Stochastic Voxel Discard): 通过丢弃虚拟每个point附近冗余点来减少计算量；
+- NRConv(Noise Resistant Submanifold Convolution): 在图像空间和点云空间进行VFE来解决噪声问题；
+
+**实现结果**：我们实现了三种模式的代码：
+
+- VirConv-L: 基于已有的融合结构Voxel RCNN实现了VirConv-L;
+- VirConv-T: 更改了refine机制，基于Casa和TED实现了精度更高的VirConv-T;
+- VirConv-S: 基于pseudo-label框架3DIouMatch，实现了半监督框架VirConv-S;
+
+在KITTI上的AP排名第1第2，同时速度很快，在xxx上推理时间为56ms，介于Voxel RCNN和PV-RCNN之间。 代码仓开源：https://github.com/hailanyi/VirConv
+
+
+
+# 基本介绍
+
+## 领域背景
+
+lidar可在各种光照条件下提供可靠的定位信息，因此3D检测对自动驾驶领域很重要。
+
+**基于Lidar的3D检测无法克服点云稀疏的固有缺陷**：虽然近几年基于Lidar的3D检测取得了很大进展，比如PointPillars/Pyramid RCNN/CT3D/PointRCNN/FromPointstoPart/3DSSD/STD等方法，但是由于点云的稀疏性，导致对远处目标的检测精度急剧下降。
+
+**LC特性互补**：camera能提供高分辨率的采样数据及丰富的上下文信息，因此基于camera和lidar的特性互补的LC融合方法能取得很好的性能，比如TransFusion/Focal Sparse Convolution/MMF/BevFusion/Frustum PointNet等。
+
+**融合方法演进过程**：
+
+- **以图像信息增强点云特征**：早期的方法通常用图像特征(CNN特征或semantic mask)来增强点云特征，比如MvxNet/PointPainting/PointAugmenting等；
+- **虚拟点云生成**：通过生成额外的点云来提高点云的密度，代表性方法有MVP/SFD等，这些方法显示出在3D检测领域的巨大潜力；但是这些方法生成的点云密度太高，导致计算量太大。因此一些方法通过下采样或设置更大的voxel尺寸来减少点云的生成数量，比如PointPillars/CenterPoint/RandLA-Net等，但是这种方法不可避免会丢失一些几何信息，导致检测精度下降或者定位精度下降。
+
+
+
+## 本文的解决思路
+
+**思路**：论文团队观察到虚拟点云应用于3D检测的两个现象，基于这两个现象提出解决方法。这两个现象是：
+
+- 目标周围的几何信息相对完整，因此大部分目标周围的虚拟点云只能带来有限的增益，但付出的计算消耗很大。作者这里贴了两张图，传达的意思是：3%的虚拟点云能带来2.2%的AP提升，剩下97%的虚拟点云只带来0.18%的AP提升，同时时间消耗大概增加2-3倍。图片如下：![image-20230504204535359](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204535359.png)
+
+- 虚拟点云中的噪点大都分布在目标的边缘，可以将点云投射到图像上来识别这些噪点。示意图如下所示：
+
+  
+
+**解决方法**：针对上述两个现象，本问提出两个技术点：
+
+- **StVD冗余点丢弃机制**：基于观察到的这两个现象，我们设计出StVD(Stochastic Voxel Discard)机制，该机制保留重要的点，即丢弃voxel附近的大量点，保留稍微远离voxel的虚拟点；
+- **NRConv(Noise Resistant Submanifold Convolution)几何特征编码层**: 该层可以对3D空间和2D空间进行几何特征编码， 通过2D空间的扩展感受野区分噪声模式，进而抹掉噪声的影响。
+
+
+
+# 相关工作
+
+**基于Lidar的3D检测方法**：基于Lidar的3D检测方法主要分为如下几种：
+
+- **早期方法**：早期的基于lidar的3D检测方法是将点云转换到BEV或range图像，然后再检测，比如BirdNet/MV3D;
+- **基于voxel的稀疏卷积方法**：比如Voxel RCNN/Structure Aware Single-Stage 3D detection/PointPillars/SECOND等；
+- **基于点云SA的方法**： 比如PV-RCNN/PointRCNN/3DSSD/STD等；这些方法虽然取得了不错的效果，但是无法解决点云稀疏性缺陷，对远处目标的检测精度很低。
+
+**基于多模的3D检测方法**：LC特性互补，可以用来提高3D检测的指标。该类方法主要分为如下几类：
+
+- **早期方法-特征增强**：早期的方法通常是用图像特征来增强点云特征，比如MvxNet/PointPainting/PointAugmenting等；
+- **特征融合方法**：LC各自独立进行特征编码，之后在局部ROI进行特征融合，比如FUTR3D/AVOD/BevFusion等；
+- **通过虚拟点云进行多模融合**：最近提出的基于虚拟点云将L和C的数据融合到一起，比如Sparse Fuse Dense/Multimodal virtual point 3D detection，本文就是基于这种方法。虚拟点云通过点云补齐的方式增强远处目标的几何信息，已经显示出在3D检测领域的强大潜力。但是这种方法存在数据量大和噪点问题，本文的主要研究方向就是解决这两个问题。
+- **3D视觉领域的噪声处理方法**：传统的去噪方式主要是各种滤波算法，比如：Bilateral Mesh Denoising/Guide 3d point cloud filtering/A review of algorithms for filtering the 3d point cloud等。最近有基于score和语义分割的点云去噪方法，也有基于目标边缘检测的去噪方法，但是这些方法会降低几何精度。
+
+**半监督3D检测方法**：最近有很多半监督方法通过大量未标注的数据来提升3D检测精度，因此我们参考3DIouMatch/Semi-supervised 3d Objection Detection via Adaptive Pseudo-labeling/Sess:Selfensembling Semi-supervised 3d Objection Detection的框架，也实现了一版基于半监督框架的VirConv-S。
+
+
+
+# VirConv整体结构
+
+VirConv的框架依赖一个新的算子VirConv， 该算子是基于虚拟点云的3D目标检测算子，整体结构如下：
+
+![image-20230504204626912](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204626912.png)
+
+![image-20230504204640372](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204640372.png)
+
+**虚拟点云**：最近很多基于Lidar的3D检测框架都应用虚拟点云，基于虚拟点云的检测方法可以分为两类：
+
+- 前融合：将原始点云与虚拟点云融合，生成融合点云，然后用现有的3D检测框架；
+- 后融合：分别对原始点云和虚拟点云进行特征编码，然后在BEV平面或局部ROI进行特征融合，比如Sparse Fuse Dense；
+
+但是这两种方法都无法解决虚拟点云稠密问题和噪声问题。
+
+
+
+## StVD细节
+
+该模块的作用是减少资源消耗，具体包含两个部分：
+
+1. **输入模块**：丢弃部分虚拟点云组成的voxel，提高训练和推理速度。通常有两种实现方式：
+
+   - 随机采样：该方法对全局点云随机采样或随机丢弃，导致远处稀疏的点云完全丢失，示意图如下所示：![image-20230504204702786](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204702786.png)
+   - FPS（Farthest point sampling): FPS的计算量大，时间复杂度是$O(n^2)$;
+
+   针对此问题，我们提出bin-based采样策略，具体机制是：
+
+   1. 将voxel按照距离划分成$N^b$个部分，本文划分成10个部分；
+   2. 近处采样固定数量的voxel，比如1000个；
+   3. 远处的voxel全部保留；
+
+   该方法能丢弃90%的虚拟点云，同时速度提高2倍，统计数据如下：![image-20230504204734055](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204734055.png)
+
+2. **StVD模块**：在VirConv模块丢弃部分虚拟voxel, 提高关于点云的鲁棒性。具体的实现方式是丢弃15%的voxel，相当于一种数据增强策略。丢弃比例与检测指标之间的关系如下图所示：![image-20230504204752787](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204752787.png)
+
+## NRConv细节
+
+虚拟点云中的噪点很难从3d空间中识别出来，但是从2d图像中识别很简单。
+
+我们基于submanifold稀疏卷积开发出noise-resistant convolution来解决虚拟噪点问题。
+
+具体流程如下：
+
+1. **几何特征编码**：先用3D submanifold稀疏卷积提取每个voxel的几何特征；
+2. **2d图像空间的噪声特征编码**：将3d voxel转化为grid point, 然后基于LC标定参数将grid point投影到图像平面，用2D稀疏卷积进行特征提取；
+3. **2D-3D特征级联**：将两个维度的特征级联起来，生成抗噪特征；
+
+NRConv结构如下图所示：
+
+![image-20230504204811670](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204811670.png)
+
+# 实现及测试指标
+
+**数据集及测试指标**：
+
+- 数据集：KITTI 3D有7481帧训练集，7518帧测试集。我们将训练集划分为3712帧训练集和3769帧验证集，与voxel RCNN保持一致。此外，我们以KITTI odometry数据集作为无标签数据集，用于半监督学习。KITTI odometry包含43552帧数据，我们用10888帧进行半监督训练。
+- 测试指标：我们以3d mAP(R40)作为评价指标，car/行人/自行车的IOU阈值分别为0.7/0.5/0.5；
+
+**实现细节**：
+
+- 虚拟点云生成：用PENet生成虚拟点云，与SFD一样；
+- pipeline: BackBone与Voxel RCNN一样；
+- 损失函数：Voxel RCNN和CasA的；
+- 数据增强：旋转/平移/翻转；
+- 训练超参数：Adam优化器，学习率0.01，epoch 60, proposal nms阈值0.8, 数量为160；
+- 推理超参数：refine的NMS阈值为0.1；
+
+**实验结果**：比Voxel RCNN的mAP提高3-5个百分点。
+
+![image-20230504210913944](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504210913944.png)
+
+**消融实验**：StVD能减少一半时间，NRConv能提高2个mAP百分点，目标越远，提高的指标越多。
+
+![image-20230504204902459](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504204902459.png)
+
+# 个人分析与总结
+
+**作者信息**：该文章是厦门大学的王程团队与MPI的史少帅合作提出的。史少帅从2018年开始就提出很多基于Lidar的3D检测方法，比如PV-RCNN系列、Voxel RCNN等；值得注意的是，王程团队虽然之前没有知名的3D检测方法，但是近两年持续提出优秀的3D检测方法，比如该团队发表的另一篇3D检测文章，在KITTI 3D榜单上排名也很靠前。
+
+**创新点**：该文章结构相对简单，创新点主要有两个：
+
+- StVD: 丢弃多余的虚拟点云;
+- NRConv: 一种3D特征和2D特征聚合方式，该聚合方式只是将3D特征和2D特征级联，3D特征与2D特征的对应关系通过标定参数获得，算是很简单的特征聚合方式。相比此聚合方式，同期的其他文章使用的聚合方法要复杂得多，比如LoGoNet使用cross-attention获得LC特征的对应关系并进行2D-3D特征聚合；MPPNet使用MLP和cross-attention组合的方式进行2D-3D特征聚合。
+
+**进一步优化方向**：该文章在KITTI 3D的榜单上排名很高，主要原因是基于图像产生虚拟点云，然后删除多余点云，用保留下的点云提取特征和目标检测。个人认为，进一步的优化方向有如下几个方面：
+
+- 关于虚拟点云的生成方法的优化：该方法生成虚拟点云的方法复用SFD的方式，使用PENet生成虚拟点云。除了根据图像生成虚拟点云的方法外，还有基于Lidar点云的分布生成虚拟点云的方法，比如BtcDet/PDA/GLENet等。是否可以将这两种方法结合，同时根据图像和原始点云，生成质量更高的虚拟点云？这个方向可以进一步探索。
+- 冗余点云删除方法的应用：本文使用StVD这一简单策略删除多余的点云，大大提高了训练和推理的速度。此方法是否也可以应用于基于原始点云的3D检测方法？将近处的多余点云删除来提高运算速度？
+- 特征聚合方式的优化：本文使用映射和级联的方式进行2D-3D特征聚合。该聚合方法要做LC全局关联和对齐，全局对齐必然导致局部对齐精度低，理由参考LoGoNet。是否可以将LoGoNet的局部对齐的方式应用于VirConv？通过提高2D-3D特征的对齐精度和聚合效果来提高目标检测的精度？或者使用其他基于Transformer的方式进行更有效的特征聚合，从而提高检测精度？
+

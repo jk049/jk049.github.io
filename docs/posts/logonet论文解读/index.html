@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html class="js no-touch  progressive-image  no-reduced-motion progressive" lang="en">
+  <head>
+    <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="/img/favicon.ico">
+
+    <meta name="keyword" content="">
+
+    <title>LoGoNet论文解读</title>
+
+    <link rel="canonical" href="/posts/logonet%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/">
+
+    <link rel="stylesheet" href="/css/global.css">
+
+    <link rel="stylesheet" href="/css/custom.css">
+
+    <link rel="stylesheet" href="/css/search.css" />
+
+    
+    
+
+    
+    
+
+</head>
+  </head>
+  <body class=" page-article   ">
+    <header>
+      <nav class="nav">
+  <div class="nav-wrapper">
+    <div class="nav-content-wrapper">
+      <div class="nav-content">
+        <a href="/ " class="nav-title">jk049&#39;s blog</a>
+        <div class="nav-menu">
+          <div class="nav-item-wrapper">
+            <a href="/posts " class="nav-item-content">Articles</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/about" class="nav-item-content">About</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/index.xml" class="nav-item-content" target="_blank">RSS</a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleSearchModal(){
+    const template = `
+    <div class="modal-body">
+      <div id="autocomplete" onclick="event.stopPropagation();"></div>
+    </div>
+    `
+    const modal = document.querySelector("#modal-wrapper")
+    if(!modal){
+      const div = document.createElement("div")
+      document.body.setAttribute("style","overflow: hidden;")
+      div.setAttribute("id", "modal-wrapper")
+      div.setAttribute("onclick", "toggleSearchModal()")
+      div.innerHTML = template
+      const script = document.createElement("script");script.setAttribute("src", "https://jk049.github.io/js/algolia.js")
+      div.appendChild(script)
+      document.body.append(div)
+    } else {
+      document.body.removeAttribute("style")
+      document.body.removeChild(modal)
+    }
+  }
+</script>
+    </header>
+    
+  
+  
+  <main id="main" class="main">
+      <section>
+        <article class="article">
+          
+          <div class=" article-header ">
+            <div class="category component">
+              <div class="component-content">
+                <div class="category-eyebrow">
+                  <span class="category-eyebrow__category category_original">
+                    
+                      
+                        3D
+                      
+                    
+                  </span>
+                  <span class="category-eyebrow__date">March 25, 2023</span>
+                </div>
+              </div>
+            </div>
+            <div class="pagetitle component">
+              <div class="component-content">
+                <h1 class="hero-headline">LoGoNet论文解读</h1>
+              </div>
+            </div>
+            <div class="component  article-subhead ">
+              <div class="component-content">首次提出局部特征对齐及聚合的理念</div>
+            </div>
+
+            <div class="tagssheet component">
+              <div class="component-content">
+                
+                  
+                  <a href="/tags/3d" class="tag">
+                    3D
+                  </a>
+                
+                  
+                  <a href="/tags/lc-fusion" class="tag">
+                    LC Fusion
+                  </a>
+                
+                  
+                  <a href="/tags/local-align" class="tag">
+                    local align
+                  </a>
+                
+              </div>
+            </div>
+          </div>
+          
+          <div class="pagebody">
+            
+            
+            
+            
+            
+            
+            
+            
+            
+<div class="component-content pagebody component">
+  <h1 id="摘要" class="pagebody-header">
+    摘要
+  </h1>
+</div><p class="component-content component">LC融合方法已经在3D检测领域展现出优秀的效果。</p>
+<p class="component-content component">目前基于多模融合的主要融合方法是全局融合，即图像特征和点云特征在全域进行融合。</p>
+<p class="component-content component">但是这种全局的融合方法无法在区域级进行融合微调，导致融合效果无法达到最优。</p>
+<p class="component-content component"><strong>本文方法</strong></p>
+<p class="component-content component">本文提出一种新颖的局部-全局融合机制：LoGoNet(Local-to-Global fusion network),。</p>
+<p class="component-content component">该框架可以在全局和局部两个level进行camera特征和点云特征的融合。</p>
+<div class="component-content component"><ul>
+<li>全局融合：基于之前已有的方法，只是以点云质心代替voxel特征，从而提高多模特征对齐的精度。</li>
+<li>局部融合：我们将proposal划分成grid，然后将grid的中心点映射到图像上，之后采样映射点周围的图像特征，将grid中心特征和映射点周围的图像特征进行融合，从而最大化利用proposal周围的纹理特征。</li>
+<li>FDA：之后我们还提出了特征动态聚合模块FDA(Feature Dynamic Aggregation), 该模块用于局部融合特征和全局融合特征之间的交互，进而生成信息更丰富的多模融合特征。</li>
+</ul></div>
+<p class="component-content component"><strong>实验结果</strong> 在Waymo和KITTI 3D上SOTA。 代码仓：https://github.com/PJLab-ADG/LoGoNet</p>
+
+<div class="component-content pagebody component">
+  <h1 id="基本介绍" class="pagebody-header">
+    基本介绍
+  </h1>
+</div><p class="component-content component">3D检测任务的目的是对目标进行分类及3D空间的定位，是自动驾驶任务的关键模块。</p>
+<div class="component-content component"><ul>
+<li>
+<p class="component-content component"><strong>背景情况</strong>：Lidar和camera是两种广泛应用的传感器，其中Lidar提供准确的深度信息和几何信息，并且已经有很多基于Lidar的3D检测方法取得了不错的效果，比如PointPillars/PV-RCNN/SECOND/CenterPoint/SESSD/VoxelNet等。</p>
+<p class="component-content component">然而，由于lidar的固有特性，导致远处的点云很稀疏，进而影响了检测效果。</p>
+<p class="component-content component">为提高检测精度，人们自然而然想到用图像的语义信息和纹理信息来补充点云信息。</p>
+<p class="component-content component">最近的方法主要是基于全局融合的方法，比如TransFusion/MV3D/Focal Sparse Convolution/EPNet/AVOD/Homogeneous multi-modal fusion/VFF/BEVFusion/PointPainting/PointAugmenting/PI-RCNN/3D-CVF/CAT-DET等。</p>
+</li>
+<li>
+<p class="component-content component"><strong>已有方法的问题</strong>：上述方法的主要问题是只在全局区域进行LC信息对齐，无法在局部区域进行对齐微调。</p>
+<p class="component-content component">而前景点云数量在每帧点云中的数量占比小于0.1%，所以基于全局区域融合的方式很容易造成关键区域不对齐，进而影响检测精度。</p>
+</li>
+<li>
+<p class="component-content component"><strong>本文解决方法</strong>：为解决局部区域对齐问题，我们提出LoGoNet检测框架，在局部和全局两个维度进行LC信息对齐。LoGoNet的关键模块有三个：</p>
+<div class="component-content component"><ol>
+<li>GoF(Global Fusion): 基于已有方法构建，比如AutoAlignV2/Homogeneous multi-modal fusion/BEVFusion/PointPainting/PointAugmenting, 在全局范围进行LC融合，通过cross-attention和ROI pooling进行LC特征融合，改进点是以voxel内点云质心代替voxel特征，从而提高对齐精度；</li>
+<li>LoF(Local Fusion): 目的是在region级信息进行更细粒度的融合，提出PIE(Position Information Encoder)模块，将proposal中的每个grid添加原始点云的位置信息编码，然后将带位置信息的grid中心投影到图像平面，之后使用cross-attention将grid特征与图像平面采样到的图像特征进行融合；</li>
+<li>FDA(Feature Dynamic Aggregation): 该模块的作用是将每个proposal的全局特征与局部特征进行融合，通过self-attention生成信息更丰富的多模特征，以供第二阶段的refine模块进行proposal细化。</li>
+</ol></div>
+</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h1 id="相关工作" class="pagebody-header">
+    相关工作
+  </h1>
+</div><div class="component-content component"><ul>
+<li><strong>基于camera的3D检测</strong>：由于camera很便宜，所以很多学者都研究如何基于图像进行3D检测，比如Liga-Stereo/Mono3D++/Smoke/Geometry uncertainty projection network/Pseudo-Lidar++等。由于图像无法直接生成深度信息，因此很多工作都通过图像推导深度信息，然后生成pseudo-Lidar数据，或者将2D特征转换为3D特征，然后在3D空间进行目标检测。最近有一些学者提出基于transformer的检测框架，比如MonoDTR/BEVFormer/PETR/DETR3D。因为很难基于图像推导出精确的深度信息，因此基于图像的3D检测效果比lidar的差很多。</li>
+<li><strong>基于Lidar的3D检测</strong>：基于lidar的检测方法可以分为3类：
+<div class="component-content component"><ul>
+<li>point方法：使用MLP直接提取点云特征，比如PointNet/PointNet++/PointRCNN/PointGNN等；</li>
+<li>voxel方法：将点云转换为voxel，然后使用3D稀疏卷积提取voxel特征，比如MppNet/Voxel RCNN/PDA/Lidar RCNN/Pyramid RCNN/INT/SECOND/VoxelNet等。还有在voxel上用transformer的方法，比如SST/Voxel Set Transformer/VoTr/CT3D等；</li>
+<li>point-voxel结合方法：将Point BackBone和Voxel BackBone结合，比如Structure Aware Single-Stage/Lidar RCNN/PV-RCNN/STD等。</li>
+</ul></div>
+</li>
+<li><strong>基于多模的3D检测方法</strong>：此类方法是最有潜力的一个方向，因为该方法可以结合Lidar和camera的优点。早期方法有AVOD, MV3D, Frustum PointNet, 在proposal进行LC特征融合；CLOCs是后融合方法，将L和C的检测结果进行融合；PointPainting/PointAugmenting/PI-RCNN用图像的语义信息增强点云特征；3D-CVF和EPNet使用可学习的标定矩阵进行多模特征融合；还有一些方法使用cross-attention进行LC自适应对齐和特征融合，比如AutoAlignV2/DeepFusion/MMF/CAT-DET等。</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h1 id="整体结构" class="pagebody-header">
+    整体结构
+  </h1>
+</div><div class="component-content component"><ul>
+<li><strong>输入数据</strong>：一帧点云和T个camera产生的图像：
+<div class="component-content component"><ul>
+<li>点云数据：$P = {(x_i, y_i, z_i)|f_i}_{i=1}^N$，N个点，f为反射强度；</li>
+<li>图片数据：$I = {I_j \in R^{H_I<em>W_I</em>3} }_{j=1}^T$, T个camera；</li>
+</ul></div>
+</li>
+<li><strong>点云处理流程</strong>：采用SECOND和VoxelNet的3D BackBone提取voxel的特征$F_V \in R^{X<em>Y</em>Z*C_V}$，其中X/Y/Z为voxel划分grid的尺寸，$C_V$是voxel特征的维度；之后采用SECOND和CenterPoint中RPN生成proposal box $B = {B_1, B_2, &hellip; ，B_n}$;</li>
+<li><strong>图像处理流程</strong>：多个camera的图像数据使用Swin Transformer/Faster RCNN的2D检测器生成稠密的语义特征$F_I \in R^{H_I/4 * W_I/4 *C_I}$;</li>
+<li><strong>融合处理流程</strong>：使用local-to-global的多模融合模块进行二阶段refine，将点云voxel特征$F_V$、图像特征$F_I$、局部位置信息进行融合； 下面将具体介绍融合模块中的Global Fusion, Local Fusion和Feature Dynamic Aggregation模块。</li>
+</ul></div>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-ccfe5bd71048ddd6488f29337c933312" id="lhtccfe5bd71048ddd6488f29337c933312">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111226920.png" alt="image-20230504111226920"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111226920
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="gofglobal-fusion" class="pagebody-header">
+    GOF(Global Fusion)
+  </h2>
+</div><p class="component-content component"><strong>以往的全局融合方法</strong>：之前的全局融合方法往往将voxel质心作为voxel feature的位置，比如Focal Sparse Convolutional Network/AutoAlignV2/EPNet/Homogeneous Multi-modal Feature Fusion/DeepFusion/PointPainting/PointAugmenting/3D-CVF等。 这些方法忽略了每个voxel内点云的分布情况，PDA和Semantic Classification of 3D Point Clouds观察到点云的分布情况更接近voxel的质心。因为point提供了目标的最原始的几何信息，也更容易应对大规模点云。</p>
+<p class="component-content component"><strong>本文的方法：CDF——质心动态融合</strong>：针对这种情况，我们设计了CDF(Centroid Dynamic Fusion)，即质心动态融合模块。该模块能在全局voxel空间内，将点云特征和图像特征进行自适应融合。同时，我们使用voxel内的点云质心代表voxel特征的位置。融合过程使用Attention is all you need/Deformable DETR两篇文章提出的deformable cross attention模块，以实现LC特征的自适应融合。示意图如下所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-0c77471869b1e28ab60b8b44b55d5595" id="lht0c77471869b1e28ab60b8b44b55d5595">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111419501.png" alt="image-20230504111419501"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111419501
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">其中，$F_V = {V_i, f_{V_i}}<em>{i=1}^{N_V}$ 表示非空voxel特征集合，$N_V$是非空voxel的数量，$f</em>{V_i}$是每个非空voxel的特征，$V_i$是voxel对应的索引。</p>
+<p class="component-content component">基本处理流程如下：</p>
+<div class="component-content component"><ol>
+<li>
+<p class="component-content component"><strong>计算voxel质心$c_i$</strong>：voxel特征对应的位置质心为$c_i$, 由voxel内所有point的位置求均值获得；</p>
+</li>
+<li>
+<p class="component-content component"><strong>计算voxel质心映射到图像上的位置$p_i$</strong>：使用映射矩阵$M$将voxel质心映射到图像平面，即$p_i = M c_i$；其中$M$由camera的内参和外参生成。</p>
+</li>
+<li>
+<p class="component-content component"><strong>生成图像聚合特征$\hat{F_I^i}$</strong>：由$p_i$周围的一系列图像特征通过偏移和加权获得。具体计算过程如下：</p>
+<div class="component-content component"><ul>
+<li>偏移特征$F_I^k$：偏移是可学习的，计算公式为$F_I^k = F_I(p_i + \Delta{p_{mik}})$;</li>
+<li>加权过程：$\hat{F_I^i} = W_m{F_I^k}$;</li>
+</ul></div>
+</li>
+<li>
+<p class="component-content component"><strong>使用deformabel cross attention生成CDF结果</strong>：
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-63e85192fcbe31011c4d265b80acbd7f" id="lht63e85192fcbe31011c4d265b80acbd7f">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111450494.png" alt="image-20230504111450494"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111450494
+      </div>
+    </div>
+  </div>
+</figure>
+其中，K是采样的$p_i$周围的图像特征数，M是self-attention head的个数，$A_{mik}$是第k个采样点第m个attention head的attention weight，$\Delta{p_{mik}}$为第k个采样点第m个attention head的采样偏移。</p>
+</li>
+<li>
+<p class="component-content component"><strong>初步生成voxel融合特征</strong>：原始voxel特征$F_V^i$与图像加强的voxel特征级联，得到voxel融合特征$\hat{F_V^<em>} \in R^{N</em>2C_V}$；</p>
+</li>
+<li>
+<p class="component-content component"><strong>生成最终voxel融合特征</strong>：使用前馈网络FFN(Feed forward network)减少一半的通道数，获得最终的融合特征$F_V^* \in R^{N*C_V}$；</p>
+</li>
+<li>
+<p class="component-content component"><strong>生成proposal特征</strong>：采用Voxel RCNN和PDA中的方式，对融合特征$F_V^*$进行ROI pooling，生成proposal特征$F_B^g$;</p>
+</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h2 id="loflocal-fusion" class="pagebody-header">
+    LoF(Local fusion)
+  </h2>
+</div><p class="component-content component">LoF的目的是在融合过程中获得细粒度的几何信息，LoF的关键模块是grid点动态融合GDF(Grid point Dynamic Fusion)，在proposal级进行点云特征和图像特征的动态融合。具体处理过程如下：</p>
+<div class="component-content component"><ol>
+<li><strong>将proposal box划分成正方体voxel grid</strong>：将proposal划分成$u<em>u</em>u$的等大小的voxel grid，每个voxel grid表示为$G_j$，其中j为grid的索引，每个grid的中心点为$z_j$;</li>
+<li><strong>生成grid特征</strong>：使用位置信息编码模块PIE(Position Information Encoder)对每个grid进行位置信息编码，得到$F_G^j$；</li>
+<li><strong>grid-ROI特征$F_B^p$</strong> ：使用PIE处理grid特征，获得gird-ROI特征$F_B^p = {F_G^1, F_G^2, &hellip; , F_G^u}$；</li>
+<li><strong>计算grid特征$F_G^j$</strong>：使用grid相对proposal质心的相对位置、proposal质心位置、每个grid内point数量进行MLP，获得grid特征$F_G^j$，计算公式为$F_G^j = MLP(\gamma, c_B, log(N_{G_j} + \tau))$, 其中$\gamma = z_j -c_B$，表示grid相对proposal质心的位置，$c_B$为proposal质心位置，$N_{G_j}$表示第j个grid$G_j$中point的数量；</li>
+<li><strong>使用GDF(Grid Dynamic Fusion)模块进行grid级的动态融合</strong>：该模块的作用是将图像特征与ROI grid特征$F_B^p$进行动态融合。基本流程是：
+<div class="component-content component"><ol>
+<li>grid质心映射：将grid的质心$z_j$映射到图像平面，映射流程与GOF一样；</li>
+<li>cross-attention特征融合：使用cross-attention将gird特征$F_B^p$与图像特征融合；</li>
+<li>特征级联：将原始grid特征与图像增强的grid特征进行级联，获得$\hat{F_B^l}$;</li>
+<li>级联特征通道降维：将上述级联的特征降维，获得最终的ROI-grid融合特征$F_B^l$;</li>
+</ol></div>
+</li>
+</ol></div>
+<p class="component-content component">LoF的整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-2b3e5b7640ff7d73b87837e7e8ba1cfa" id="lht2b3e5b7640ff7d73b87837e7e8ba1cfa">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111640035.png" alt="image-20230504111640035"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111640035
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="fdafeature-dynamic-aggregation" class="pagebody-header">
+    FDA(Feature Dynamic Aggregation)
+  </h2>
+</div><p class="component-content component">LoF/GoF、PIE模块之后，我们获得3个特征：$F_B^l, F_B^g, F_B^p$。这3个特征相互独立，没有交互。 因此我们提出特征动态聚合模块FDA(Feature Dynamic Aggregation)，使用self-attention建立不同grid point之间的联系。 具体的处理流程分为两步：</p>
+<div class="component-content component"><ol>
+<li><strong>获得融合特征$F_S$</strong>：将三个特征相加获得，即$F_S = F_B^p + F_B^l + F_B^g$；</li>
+<li><strong>建立不同grid point间$F_S$的交互</strong>：使用self-attention进行交互；</li>
+<li><strong>box refine</strong>：使用FDA生成的flattened feature进行refine；</li>
+</ol></div>
+<p class="component-content component">FDA整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-d3069633f7e4758f4c50da658a34c0e1" id="lhtd3069633f7e4758f4c50da658a34c0e1">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111702200.png" alt="image-20230504111702200"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111702200
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="损失函数" class="pagebody-header">
+    损失函数
+  </h2>
+</div><p class="component-content component">LoGoNet只训练lidar分支，camera分支不进行训练。</p>
+<p class="component-content component">损失函数由RPN损失、置信度损失和回归框损失组成：$L = L_{RPN} + L_{conf} +\alpha L_{reg}$。</p>
+<p class="component-content component">其中$\alpha$是超参数，本文设置为1。 整个优化模块参考Voxel RCNN和CenterPoint。</p>
+
+<div class="component-content pagebody component">
+  <h1 id="实验结果" class="pagebody-header">
+    实验结果
+  </h1>
+</div>
+<div class="component-content pagebody component">
+  <h2 id="数据集" class="pagebody-header">
+    数据集
+  </h2>
+</div><p class="component-content component">在WOD和KITTI 3D上测试。两个数据集的基本信息如下：</p>
+<div class="component-content component"><ul>
+<li>
+<p class="component-content component"><strong>WOD基本信息</strong>：其中WOD是一个很大的数据集，场景分布也很多。包含798个训练序列、202个验证序列、150个测试序列。</p>
+<p class="component-content component">每个序列包含200帧数据，每帧有1分点云数据、5份图像数据。其中点云在x、y平面的扫描范围是[-75.2, 74.2]米，在z轴的扫描范围是[-2, 4]米。</p>
+<p class="component-content component">voxel的尺寸设置为[0.1m, 0.1m, 0.15m]；我们使用AP和APH作为测试指标，以这两个指标在LEVEL1和LEVEL2难度上测试。</p>
+<p class="component-content component">其中LEVEL1之评估点云数超过5个点的目标，LEVEL2则评估点云数超过1个点的目标，WOD上3D检测榜单的排名参考指标是mAPH(L2)。</p>
+</li>
+<li>
+<p class="component-content component"><strong>KITTI 3D基本信息</strong>：KITTI 3D数据集包含7481个训练样本和7518个测试样本，测试指标是AP。</p>
+<p class="component-content component">KITTI 3D每帧点云在x方向的扫描范围是[0, 70.4], y方向的扫描范围是[-40, 40], z方向的扫描范围是[-3, 1]。</p>
+</li>
+</ul></div>
+<p class="component-content component">参考3D object proposals for accurate object class detection对数据集进行划分。 voxel尺寸设置为[0.05, 0.05, 0.1]；</p>
+
+<div class="component-content pagebody component">
+  <h2 id="参数设置" class="pagebody-header">
+    参数设置
+  </h2>
+</div><div class="component-content component"><ul>
+<li>attention head数量M：4；</li>
+<li>采样point数K：4；</li>
+<li>每个voxel内grid的尺寸u：6；</li>
+<li>3D backBone: WOD使用CenterPoint的，KITTI 3D使用Voxel RCNN的；</li>
+<li>图像BackBone: 使用Swin Transformer的Swin-Tiny; + 图像resize: 尺寸缩减一半；</li>
+<li>图像特征输出通道数：64；</li>
+<li>数据增强：缩放、翻转、旋转；</li>
+<li>后处理NMS阈值：WOD上0.7， KITTI上0.55；</li>
+<li>训练epoch数：CenterPoint 20epoch, Voxel RCNN 80 epochs, LoGoNet 6 epoch;</li>
+<li>BatchSize: CenterPoint 8, Voxel RCNN 2;</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h2 id="实验结果-1" class="pagebody-header">
+    实验结果
+  </h2>
+</div><p class="component-content component">SOTA, 使用TTA时，超越之前SOTA文章BEVFusion 1.05个mAPH(L2), 使用5帧序列输入时，超越MPPNet 16帧序列输入指标1.43个mAPH(L2)。 详细结果如下表：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-c38dcc6f7343a03d35feafba8f4fd1be" id="lhtc38dcc6f7343a03d35feafba8f4fd1be">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111727712.png" alt="image-20230504111727712"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111727712
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-b43e562c8326aeedfe60cedac45e56c8" id="lhtb43e562c8326aeedfe60cedac45e56c8">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111737338.png" alt="image-20230504111737338"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111737338
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-a8e972134c79cc20d0cb295fd8be9be4" id="lhta8e972134c79cc20d0cb295fd8be9be4">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111748896.png" alt="image-20230504111748896"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111748896
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-2b959f3ba419729ddb85ff25e14f6780" id="lht2b959f3ba419729ddb85ff25e14f6780">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230504111758881.png" alt="image-20230504111758881"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230504111758881
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h1 id="个人分析与总结" class="pagebody-header">
+    个人分析与总结
+  </h1>
+</div><p class="component-content component"><strong>作者信息</strong>：这篇文章是上海AI实验室的乔宇、YikangLi 团队于2023年3月提出的一篇基于LC融合的3D检测算法，在KITTI和WOD上的排名都很靠前，刚发表时甚至登顶榜首。</p>
+<p class="component-content component"><strong>创新点</strong>：该方法的主要创新点在于：提出局部融合的概念。</p>
+<p class="component-content component">理由是：之前的方法都是基于全局融合，然而前景点(目标上的反射点)数量在所有电云中的比例小于0.1%。如果基于全局融合，势必导致局部特征对齐不准确，会为追求全局对齐的精度而牺牲局部目标特征的对齐精度。</p>
+<p class="component-content component"><strong>其他组件</strong>：其他组间都是使用已有方法：</p>
+<div class="component-content component"><ul>
+<li>点云3d 特征/2d 特征使用second的结构；</li>
+<li>图像特征使用Swin Transformer的结构；</li>
+<li>图像特征在全局和proposal级的融合使用transformer的cross-attention和self-attention, 与M3DETR/CenterFormer/CT3D的方法大同小异；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h2 id="演进方向" class="pagebody-header">
+    演进方向
+  </h2>
+</div><div class="component-content component"><ul>
+<li>
+<p class="component-content component"><strong>去除全局融合模块</strong>：总的来说，局部特征融合是有效的。通过消融实验可以看出，局部融合能提高1-2个mAPH的百分点。</p>
+<p class="component-content component">但是局部融合和全局融合可能存在特征重复，如果进行进一步演进的话，可以考虑去除全局融合模块。</p>
+<p class="component-content component">因为从理论上讲，如果proposal级进行过LC特征融合，那么基于这些特征的RPN和Refine足够进行目标检测，没必要再生成携带大量背景特征的全局融合特征。</p>
+<p class="component-content component">此外，从消融实验也可以看出，在局部融合的基础上加上全局融合，提升的mAPH只有0.1-0.5个百分点，带来的增益很小。</p>
+</li>
+<li>
+<p class="component-content component"><strong>与其他方法结合</strong>：LoGoNet的3d BackBone可以尝试使用更先进的，比如DSVT; 此外可以尝试点云补齐方法，比如GLENet; 也可以与多帧序列方法结合，比如MPPNet。</p>
+</li>
+<li>
+<p class="component-content component"><strong>尝试新的融合方法</strong>：目前该文章使用self-attention和cross-attention机制进行LC特征融合，接下来可以探索是否有更有效的融合方式。</p>
+</li>
+</ul></div>
+
+          </div>
+          
+          <div class="component">
+            <div class="component-content">
+              <div class="article-copyright">
+                <p class="content">
+                  Copyright: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed" target="_blank">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</a>
+                </p>
+                <p class="content">Author:  jk049 </p>
+                <p class="content">Posted on:  March 25, 2023</p>
+              </div>
+            </div>
+          </div>
+          
+        </article>
+      </section>
+  </main>
+
+  <script>
+    var script = document.createElement("script");script.src = "https://jk049.github.io/js/initPost.js";
+    document.head.appendChild(script);
+  </script>
+
+    
+    <div class="footer-main ">
+  <div class="content-body footer-wraper">
+    <div class="footer-box">
+      <div class="foot-nav">
+        <div class="foot-nav-items">
+          <div class="item">
+            <div class="logo"></div>
+            <div class="email">Email: <a href="mailto:floyd.li@outlook.com">floyd.li@outlook.com</a></div>
+          </div>
+
+          <div class="item community">
+            <div class="item-title">Social Media</div>
+            
+              <a href="https://github.com/floyd-li" target="_blank">Github</a>
+            
+              <a href="https://twitter.com/some-one" target="_blank">Twitter</a>
+            
+          </div>
+
+          <div class="item resources">
+            <div class="item-title">Related</div>
+            
+              <a href="https://yufengbiji.com/" target="_blank">驭风笔记</a>
+            
+              <a href="https://apple.com/" target="_blank">Apple</a>
+            
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="item copyright">
+          &copy; 2023
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> & <a href="https://github.com/floyd-li/hugo-theme-itheme" target="_blank">iTheme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+    
+    
+
+    
+    
+</html>

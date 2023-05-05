@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>local align on jk049&#39;s blog</title>
+    <link>https://jk049.github.io/tags/local-align/</link>
+    <description>Recent content in local align on jk049&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>Floyd Li</copyright>
+    <lastBuildDate>Sat, 25 Mar 2023 21:39:49 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/local-align/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LoGoNet论文解读</title>
+      <link>https://jk049.github.io/posts/logonet%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/</link>
+      <pubDate>Sat, 25 Mar 2023 21:39:49 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/logonet%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/</guid>
+      <description>摘要 LC融合方法已经在3D检测领域展现出优秀的效果。 目前基于多模融合的主要融合方法是全局融合，即图像特征和点云特征在全域进行融合。 但是这种全</description>
+    </item>
+    
+  </channel>
+</rss>

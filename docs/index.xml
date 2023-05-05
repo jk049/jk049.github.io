@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Floyd Li</copyright>
-    <lastBuildDate>Mon, 20 Mar 2023 13:06:38 +0800</lastBuildDate><atom:link href="https://jk049.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 05 May 2023 20:02:57 +0800</lastBuildDate><atom:link href="https://jk049.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>论文解读——MPPNet</title>
+      <link>https://jk049.github.io/posts/%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBmppnet/</link>
+      <pubDate>Fri, 05 May 2023 20:02:57 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBmppnet/</guid>
+      <description>摘要 3D检测的可靠性和准确性对很多应用都很重要，比如自动驾驶、服务机器人等。 MPPNet结构:本文提出MPPNet，一种高效且灵活的3D检测</description>
+    </item>
+    
     <item>
       <title>Markdown Syntax Example</title>
       <link>https://jk049.github.io/posts/mark-down-syntax/</link>

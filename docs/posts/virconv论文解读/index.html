@@ -519,12 +519,15 @@
     个人分析与总结
   </h1>
 </div><p class="component-content component"><strong>作者信息</strong>：该文章是厦门大学的王程团队与MPI的史少帅合作提出的。史少帅从2018年开始就提出很多基于Lidar的3D检测方法，比如PV-RCNN系列、Voxel RCNN等；值得注意的是，王程团队虽然之前没有知名的3D检测方法，但是近两年持续提出优秀的3D检测方法，比如该团队发表的另一篇3D检测文章，在KITTI 3D榜单上排名也很靠前。</p>
-<p class="component-content component"><strong>创新点</strong>：该文章结构相对简单，创新点主要有两个：</p>
+<p class="component-content component"><strong>创新点</strong>：该文章结构相对简单，在KITTI 3D的榜单上排名很高，主要原因是基于图像产生虚拟点云，然后删除多余点云，用保留下的点云提取特征和目标检测。创新点主要有两个：</p>
 <div class="component-content component"><ul>
 <li>StVD: 丢弃多余的虚拟点云;</li>
 <li>NRConv: 一种3D特征和2D特征聚合方式，该聚合方式只是将3D特征和2D特征级联，3D特征与2D特征的对应关系通过标定参数获得，算是很简单的特征聚合方式。相比此聚合方式，同期的其他文章使用的聚合方法要复杂得多，比如LoGoNet使用cross-attention获得LC特征的对应关系并进行2D-3D特征聚合；MPPNet使用MLP和cross-attention组合的方式进行2D-3D特征聚合。</li>
 </ul></div>
-<p class="component-content component"><strong>进一步优化方向</strong>：该文章在KITTI 3D的榜单上排名很高，主要原因是基于图像产生虚拟点云，然后删除多余点云，用保留下的点云提取特征和目标检测。个人认为，进一步的优化方向有如下几个方面：</p>
+<p class="component-content component"><strong>大话优化方向</strong>：上面的内容都是基于论文内容的客观陈述，接下来是个人主观分析，请读者持批判态度阅读。</p>
+<p class="component-content component">分析基于个人掌握的知识，从本文出发，对3D检测技术的演进方向进行主观分析，因此称为“大话”。</p>
+<p class="component-content component">但是后续我会进行独立实验及相关的研究跟踪，预知后续发展请保持关注。</p>
+<p class="component-content component">话不多说，上菜：</p>
 <div class="component-content component"><ul>
 <li>关于虚拟点云的生成方法的优化：该方法生成虚拟点云的方法复用SFD的方式，使用PENet生成虚拟点云。除了根据图像生成虚拟点云的方法外，还有基于Lidar点云的分布生成虚拟点云的方法，比如BtcDet/PDA/GLENet等。是否可以将这两种方法结合，同时根据图像和原始点云，生成质量更高的虚拟点云？这个方向可以进一步探索。</li>
 <li>冗余点云删除方法的应用：本文使用StVD这一简单策略删除多余的点云，大大提高了训练和推理的速度。此方法是否也可以应用于基于原始点云的3D检测方法？将近处的多余点云删除来提高运算速度？</li>

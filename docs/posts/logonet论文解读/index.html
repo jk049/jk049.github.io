@@ -574,12 +574,11 @@
 <li>图像特征使用Swin Transformer的结构；</li>
 <li>图像特征在全局和proposal级的融合使用transformer的cross-attention和self-attention, 与M3DETR/CenterFormer/CT3D的方法大同小异；</li>
 </ul></div>
-
-<div class="component-content pagebody component">
-  <h2 id="演进方向" class="pagebody-header">
-    演进方向
-  </h2>
-</div><div class="component-content component"><ul>
+<p class="component-content component"><strong>大话演进方向</strong>：上面的内容都是基于论文内容的客观陈述，接下来是个人主观分析，请读者持批判态度阅读。</p>
+<p class="component-content component">分析基于个人掌握的知识，从本文出发，对3D检测技术的演进方向进行主观分析，因此称为“大话”。</p>
+<p class="component-content component">但是后续我会进行独立实验及相关的研究跟踪，预知后续发展请保持关注。</p>
+<p class="component-content component">话不多说，上菜：</p>
+<div class="component-content component"><ul>
 <li>
 <p class="component-content component"><strong>去除全局融合模块</strong>：总的来说，局部特征融合是有效的。通过消融实验可以看出，局部融合能提高1-2个mAPH的百分点。</p>
 <p class="component-content component">但是局部融合和全局融合可能存在特征重复，如果进行进一步演进的话，可以考虑去除全局融合模块。</p>

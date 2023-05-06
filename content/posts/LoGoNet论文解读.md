@@ -1,5 +1,5 @@
 ---
-title: "LoGoNet论文解读"
+title: "3D检测论文解读——LoGoNet"
 date: 2023-03-25T21:39:49+08:00
 description: "首次提出局部特征对齐及聚合的理念"
 draft: false

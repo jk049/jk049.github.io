@@ -2,7 +2,7 @@
 title: "3D检测论文解读——SFD"
 date: 2023-05-06T16:49:18+08:00
 description: "第一篇使用图片生成虚拟点云，然后进行LC融合3D检测的文章"
-draft: true
+draft: false
 author: "jk049"
 cover: "https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-18 220955.png"
 tags: ["虚拟点云","3D","LC Fusion"]

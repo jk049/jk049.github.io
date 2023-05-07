@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Floyd Li</copyright>
-    <lastBuildDate>Fri, 05 May 2023 20:02:57 +0800</lastBuildDate><atom:link href="https://jk049.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 06 May 2023 16:49:18 +0800</lastBuildDate><atom:link href="https://jk049.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>3D检测论文解读——SFD</title>
+      <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBsfd/</link>
+      <pubDate>Sat, 06 May 2023 16:49:18 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBsfd/</guid>
+      <description>摘要 背景：当前基于Lidar的3D检测算法不可避免会收到点云稀疏性的影响，很多学者尝试通过多模融合的方法解决此问题。 然而当前融合方法也不成熟</description>
+    </item>
+    
     <item>
       <title>MPPNet论文解读</title>
       <link>https://jk049.github.io/posts/mppnet%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BB/</link>

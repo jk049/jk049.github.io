@@ -19,27 +19,27 @@ blockquote {
 }
 
 h1.pagebody-header {
-  font-size: 1.5em;
+  font-size: 1.9em;
 }
 
 h2.pagebody-header{
-  font-size: 1.4em;
-}
-
-h3.pagebody-header{
   font-size: 1.3em;
 }
 
-h4.pagebody-header{
-  font-size: 1.2em;
-}
-
-h5.pagebody-header{
+h3.pagebody-header{
   font-size: 1.1em;
 }
 
+h4.pagebody-header{
+  font-size: 1.0em;
+}
+
+h5.pagebody-header{
+  font-size: 0.9em;
+}
+
 h6.pagebody-header{
-  font-size: 1em;
+  font-size: 0.8em;
 }
 
 .code pre {

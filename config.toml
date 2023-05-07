@@ -3,13 +3,13 @@ languageCode = 'en'
 defaultContentLanguage = "en"
 hasCJKLanguage = true
 title = "jk049's blog"
-copyright = 'Floyd Li'
+copyright = 'jk049'
 theme = 'iTheme'
 publishDir = "docs"
 paginate = 5
 [params]
   defaultCover = 'https://www.apple.com.cn/newsroom/images/apple-logo_black.jpg.landing-regular_2x.jpg'
-  email = 'floyd.li@outlook.com'
+  email = 'jk049jk@gmail.com'
   [[params.socialMedia]]
     name = 'Github'
     url = 'https://github.com/floyd-li'

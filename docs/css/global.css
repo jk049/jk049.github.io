@@ -5416,8 +5416,8 @@ html.no-touch.no-reduced-motion .tile.tile-list[data-focus-method=key] .media--v
 }
 
 .component {
-  margin-top: 44px;
-  margin-bottom: 44px
+  margin-top: 10px;
+  margin-bottom: 10px
 }
 
 @media only screen and (max-width: 1068px) {
@@ -5447,7 +5447,7 @@ html.no-touch.no-reduced-motion .tile.tile-list[data-focus-method=key] .media--v
 
 .pagebody {
   font-size: 21px;
-  line-height: 1.8611;
+  line-height: 1.5611;
   font-weight: 400;
   letter-spacing: .012em;
   font-family: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif
@@ -7382,7 +7382,7 @@ span.tag-date {
 }
 
 ul>li, ol>li {
-  margin: 1em 0px;
+  margin: 0.4em 0px;
 }
 
 code {

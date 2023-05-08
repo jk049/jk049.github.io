@@ -13,6 +13,8 @@ theme: "light"
 
 厦门大学王程团队与赢彻科技杨睿刚团队合作发表于2022.11，主要创新点是将TTA的数据增强机制前移，并对特征提取和特征聚合模块做了相应适配，以单模型代替传统的TTA+model  ensemble机制的多模型推理。
 
+![head](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/head.png)
+
 实验结果还行，在KITTI 验证集上对car moderate的检测精度达85.28, WOD上没什么竞争力。3090上推理速度11fps，显存消耗翻倍。
 
 ![屏幕截图 2022-10-18 175341](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-18 175341.png)

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="js no-touch  progressive-image  no-reduced-motion progressive" lang="en">
+  <head>
+    <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="/img/favicon.ico">
+
+    <meta name="keyword" content="">
+
+    <title>3D检测论文解读——TED</title>
+
+    <link rel="canonical" href="/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBted/">
+
+    <link rel="stylesheet" href="/css/global.css">
+
+    <link rel="stylesheet" href="/css/custom.css">
+
+    <link rel="stylesheet" href="/css/search.css" />
+
+    
+    
+
+    
+    
+
+</head>
+  </head>
+  <body class=" page-article   ">
+    <header>
+      <nav class="nav">
+  <div class="nav-wrapper">
+    <div class="nav-content-wrapper">
+      <div class="nav-content">
+        <a href="/ " class="nav-title">jk049&#39;s blog</a>
+        <div class="nav-menu">
+          <div class="nav-item-wrapper">
+            <a href="/posts " class="nav-item-content">Articles</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/about" class="nav-item-content">About</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/index.xml" class="nav-item-content" target="_blank">RSS</a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleSearchModal(){
+    const template = `
+    <div class="modal-body">
+      <div id="autocomplete" onclick="event.stopPropagation();"></div>
+    </div>
+    `
+    const modal = document.querySelector("#modal-wrapper")
+    if(!modal){
+      const div = document.createElement("div")
+      document.body.setAttribute("style","overflow: hidden;")
+      div.setAttribute("id", "modal-wrapper")
+      div.setAttribute("onclick", "toggleSearchModal()")
+      div.innerHTML = template
+      const script = document.createElement("script");script.setAttribute("src", "https://jk049.github.io/js/algolia.js")
+      div.appendChild(script)
+      document.body.append(div)
+    } else {
+      document.body.removeAttribute("style")
+      document.body.removeChild(modal)
+    }
+  }
+</script>
+    </header>
+    
+  
+  
+  <main id="main" class="main">
+      <section>
+        <article class="article">
+          
+          <div class=" article-header ">
+            <div class="category component">
+              <div class="component-content">
+                <div class="category-eyebrow">
+                  <span class="category-eyebrow__category category_original">
+                    
+                      
+                        数据增强
+                      
+                    
+                  </span>
+                  <span class="category-eyebrow__date">May 8, 2023</span>
+                </div>
+              </div>
+            </div>
+            <div class="pagetitle component">
+              <div class="component-content">
+                <h1 class="hero-headline">3D检测论文解读——TED</h1>
+              </div>
+            </div>
+            <div class="component  article-subhead ">
+              <div class="component-content">TTA&#43;model ensemble的数据增强前移，以一个模型对多个增强数据进行特征提取和聚合，并对特征提取和聚合模块做了相应的适配</div>
+            </div>
+
+            <div class="tagssheet component">
+              <div class="component-content">
+                
+                  
+                  <a href="/tags/%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA" class="tag">
+                    数据增强
+                  </a>
+                
+                  
+                  <a href="/tags/3d" class="tag">
+                    3D
+                  </a>
+                
+                  
+                  <a href="/tags/lidar" class="tag">
+                    LiDAR
+                  </a>
+                
+              </div>
+            </div>
+          </div>
+          
+          <div class="pagebody">
+            
+            
+            
+            
+            
+            
+            
+            
+            
+<div class="component-content pagebody component">
+  <h1 id="一句话总结" class="pagebody-header">
+    一句话总结
+  </h1>
+</div><p class="component-content component">厦门大学王程团队与赢彻科技杨睿刚团队合作发表于2022.11，主要创新点是将TTA的数据增强机制前移，并对特征提取和特征聚合模块做了相应适配，以单模型代替传统的TTA+model  ensemble机制的多模型推理。</p>
+<p class="component-content component">实验结果还行，在KITTI 验证集上对car moderate的检测精度达85.28, WOD上没什么竞争力。3090上推理速度11fps，显存消耗翻倍。</p>
+
+<div class="component-content pagebody component">
+  <h1 id="摘要" class="pagebody-header">
+    摘要
+  </h1>
+</div><p class="component-content component"><strong>背景</strong>：3D检测对自动驾驶很重要，之前的检测方法没有考虑航向变化和放射变换(variations of rotation and reflection transformations)，因此需要大网络和数据增强来提高鲁棒性。 最近的<strong>equivariant network</strong>对点云进行多重变换，然后使用共享网络来对变换进行建模，显示出对目标几何结构建模的强大潜力。 但是Equivariant network很难直接应用到点云3D检测任务上，因为其计算量很大，推理速度很慢。</p>
+<p class="component-content component"><strong>本文方法</strong>：本文提出TED(Transformation Equivariant 3D Detector), 解决了Equivariant在点云上的应用问题。基本处理流程是：</p>
+<div class="component-content component"><ol>
+<li>使用稀疏卷积3D BackBone提取多通道等价变换(multi-channel transformation-equivariant)的voxel特征；</li>
+<li>进行特征对齐和特征聚合，将上述的等价特征转换为轻量化的表征形式；</li>
+</ol></div>
+<p class="component-content component"><strong>实验结果</strong>：在KITTI 3D上排名第一。 代码仓：未开源。</p>
+
+<div class="component-content pagebody component">
+  <h1 id="基本介绍" class="pagebody-header">
+    基本介绍
+  </h1>
+</div><p class="component-content component">当目标的朝向变换时，我们希望检测框的朝向也跟着变换，但是其他参数都不变。但是目前的模型大都无法解决此问题。 本文的TED的目标就是解决此问题。</p>
+<p class="component-content component">**【注意】**这是一篇数据增强方法吗？</p>
+<p class="component-content component">最近的equivariant network通过共享卷积网络解决了变换问题，但是计算量太大，无法实时运行。</p>
+<p class="component-content component">本文的TED解决了计算量问题。关键模块有3个：</p>
+<div class="component-content component"><ul>
+<li>TeSpConv(Transformation-equivariant Sparse Convolution) BackBone: 使用共享权重来记录等价变换的voxel特征；</li>
+<li>TeBEV(Transformation-equivariant Bird Eye View) pooling: 在场景级进行等价变换特征的轻量化转换；</li>
+<li>TiVoxel(Transformation-invariant Voxel) pooling: ：在目标级进行等价变换特征的轻量化转换；</li>
+<li>DA-Aug(Distance-Aware data Augmentation): 增强稀疏目标的几何特征；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h1 id="相关工作" class="pagebody-header">
+    相关工作
+  </h1>
+</div><p class="component-content component">最早的Lidar3D检测方法是将3D形式的点云转换到BEV平面再检测；最近的方法大都基于voxel和point，比如SECOND/PointPIllars/SA-SSD/SE-SSD/Voxel RCNN/SFD/3DSSD/SASA/PointRCNN/PV-RCNN/STD/CT3D等。 本文的TED框架以2阶段检测的基于voxel的pipeline为基础，在等价变换方面进行了扩展。</p>
+<p class="component-content component"><strong>等价变换模型</strong>：Transformation equivariance，比如</p>
+<div class="component-content component"><ul>
+<li>Spherical CNNs(2018):</li>
+<li>General E2 Equivariant Steerable CNNs(2019):</li>
+<li>Group Equivariant Convolutional Networks(2016):</li>
+<li>Learning Stterable Filters for Rotation Equivariant CNNs(2018):还有一些基于voxel和point的处理3D数据的等价变换模型，比如：</li>
+<li>SO3: Vector Neurons: A General Framework for SO3 Equivariant Networks(2021);</li>
+<li>Equivariant Point(2021):</li>
+<li>3D Steerable CNNs: Learning Rotationally Equivariant Features in Volumetric Data(2018);还有专门用于目标检测的模型，比如：</li>
+<li>ReDet: A Rotation equivariant Detector for Aerial Object Detection(2021);</li>
+<li>Body Constitution and Unhealthy Lifestyles in a primary(2021);这些方法都太复杂，消耗太多计算量，本文TED针对这些方法做了实时性运行的优化。</li>
+</ul></div>
+<p class="component-content component"><strong>等价变换的及其不变性</strong>：将X空间变换为Y空间的等价变换公式为$f[T_g^X(x)] = T_g^Y[f(x)], x \in X, g \in G$. 其中T表示变换操作。</p>
+
+<div class="component-content pagebody component">
+  <h1 id="ted具体结构" class="pagebody-header">
+    TED具体结构
+  </h1>
+</div><p class="component-content component">主要处理流程是使用TeSpConv提取并缓存多通道变换的voxel特征；使用TeBEV和TiVoxel来对齐和聚合等价变换的特征。整体结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-c057c335370ddc6209d486e6cbff8726" id="lhtc057c335370ddc6209d486e6cbff8726">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230508132106262.png" alt="image-20230508132106262"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230508132106262
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h2 id="transformation-equivariant-voxel-backbone" class="pagebody-header">
+    Transformation Equivariant Voxel BackBone
+  </h2>
+</div><p class="component-content component">为了从原始点云中高效提取等价变换特征，我们设计了Transformation equivariant sparse convolution 3D BackBone&ndash;TeSpConv.该BackBone基于稀疏卷积，但是稀疏卷积对旋转和反射不等价。 为解决稀疏卷积在旋转和反射方面的等价问题，我们增加了变换通道。通过以下两种方式我们实现了等价：</p>
+<div class="component-content component"><ul>
+<li>对输入点云进行不同的旋转和反射变换；</li>
+<li>提取每种变换的voxel特征，变换通道间权重高度共享；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h2 id="transformation-equivariant-bev-pooling" class="pagebody-header">
+    Transformation Equivariant BEV Pooling
+  </h2>
+</div><div class="component-content component"><ol>
+<li>将上一步的每种变换看作一个通道，共有2N个变换，因此有2N个特征通道。</li>
+<li>然后将所有voxel特征在高度方向上压缩，获得BEV特征。</li>
+<li>将3D空间的grid point映射到BEV上，然后用双线性插值获得2N个聚合特征。</li>
+<li>对上述的2N个聚合特征进行max-pooling, 获得最终的BEV特征。</li>
+</ol></div>
+<p class="component-content component">示意图如下所示：</p>
+<!-- raw HTML omitted -->
+
+<div class="component-content pagebody component">
+  <h2 id="transformation-invariant-voxel-pooling" class="pagebody-header">
+    Transformation Invariant Voxel Pooling
+  </h2>
+</div><p class="component-content component">该模块的作用是在在目标级进行多变换通道的特征聚合。具体做法是：</p>
+<div class="component-content component"><ol>
+<li>将原始3D空间的proposal转换到各个变换的空间，获得对应的voxel特征；</li>
+<li>使用VSA(Voxel Set Abstration)对多个变换的voxel特征进行聚合；</li>
+<li>使用cross-grid attention对第2步获得的多个grid特征进行进一步聚合，以获得更好的几何特征。</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h2 id="distance-aware-data-augmentation" class="pagebody-header">
+    Distance Aware Data Augmentation
+  </h2>
+</div><p class="component-content component">远距离目标的几何信息缺失往往会导致检测指标大幅度下降。 为解决此问题，我们从近处的稠密目标生成稀疏训练样本，来提高几何提取能力。 最简单的采样方法就是随机采样或FPS(Farthest Point Sampling)，但是这种方法会破坏点云的分布形式。</p>
+<p class="component-content component">为解决此问题，我们提出了distance-aware采样策略。具体机制是：</p>
+<div class="component-content component"><ol>
+<li>对于gt box及其内部point，对其位置加随机偏移$\alpha$;</li>
+<li>将点云及voxel转换为球形；</li>
+<li>将每个voxel内最靠近球心的点作为采样点；</li>
+<li>为模拟遮挡情况，对上述的采样点进行一定比例的随机丢弃；</li>
+</ol></div>
+
+<div class="component-content pagebody component">
+  <h1 id="实验结果" class="pagebody-header">
+    实验结果
+  </h1>
+</div><p class="component-content component"><strong>实现细节</strong>：</p>
+<div class="component-content component"><ul>
+<li>版本：我们实现了基于单模Lidar的TED-S版本和基于多模的TED-M版本。</li>
+<li>变换方式：对于变换方式，采用3种旋转变换方式和2种反射变换方式。</li>
+<li>proposal数和NMS阈值:在KITTI数据集上，proposal个数和NMS阈值与Voxel RCNN保持一致；在Waymo数据集上与PV-RCNN++保持一致。</li>
+<li>训练硬件：2块3090；</li>
+<li>batch size: 4;</li>
+<li>学习率：0.01；</li>
+</ul></div>
+<p class="component-content component"><strong>实验结果</strong>：具体信息如下表：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-941ddb37ae7b7ea2175c3f4bdb469bc2" id="lht941ddb37ae7b7ea2175c3f4bdb469bc2">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230508132206414.png" alt="image-20230508132206414"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230508132206414
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-2bdaecb67f62edf58c5aa0dcf499b7d9" id="lht2bdaecb67f62edf58c5aa0dcf499b7d9">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230508132216101.png" alt="image-20230508132216101"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230508132216101
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-fb4d35d7e689aa632f424e683a9d6efb" id="lhtfb4d35d7e689aa632f424e683a9d6efb">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230508132228366.png" alt="image-20230508132228366"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230508132228366
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">总的来说：</p>
+<div class="component-content component"><ul>
+<li>KITTI 3D上优秀：在KITTI 3D上测试集上，TED-M对car-moderate样本的检测率到达85.28%, 介于用TTA和没用TTA方法之间，算是很优秀的指标，但是没公布TED-S的，估计没什么竞争力；</li>
+<li>WOD上没竞争力：在WOD验证集上对vehicle L1样本的mAP为79.26，远低于同时期的SOTA方法；</li>
+</ul></div>
+<p class="component-content component"><strong>消融实验</strong>：</p>
+<div class="component-content component"><ul>
+<li>旋转变换次数：在3和4之间达到最高检测率，为实时性，将变换次数设为3，可以在3090上达到11fps的帧率；</li>
+<li>各个组件有效性分析：具体信息如下表：
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-7027cd0a13f9ea5a15a4f33aa91216a8" id="lht7027cd0a13f9ea5a15a4f33aa91216a8">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230508132251246.png" alt="image-20230508132251246"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230508132251246
+      </div>
+    </div>
+  </div>
+</figure>
+</li>
+</ul></div>
+<p class="component-content component"><strong>不足点</strong></p>
+<div class="component-content component"><ul>
+<li>与Voxel RCNN相比，消耗的GPU内存翻倍；</li>
+<li>数据变换时没有用缩放，该方法在实践中应用较少；</li>
+<li>因为变换过程涉及voxel，所以不是完全的等效变换，voxel尺寸越小越接近等效变换，但是计算量越大；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h1 id="个人分析与总结" class="pagebody-header">
+    个人分析与总结
+  </h1>
+</div><p class="component-content component"><strong>作者信息</strong>：厦门大学的王程团队与赢彻科技的杨睿刚团队合作，发表于2022年11月。</p>
+<p class="component-content component">值得注意的是，王程团队与MPI的史少帅与次年3月发表了VirConv，同样在榜单上排名很靠前。只不过两篇文章用的完全不一样的方法，这篇TED应该是与后来的VirConv是同时期进行的工作，没有演进的关系。</p>
+<p class="component-content component"><strong>创新点</strong>：核心思路是数据增强前移，对输入数据进行各种变换，然后用同一个模型进行特征提取与聚合，其中特征提取和聚合做了相应的适配修改。与TTA+model ensemble方法相比，速度节省了很多，数据增强的效果差不多。</p>
+<p class="component-content component">在结果方面，与主流方法TTA相比，指标稍低一点，但是比未加TTA的方法的指标高。</p>
+<p class="component-content component">**大话演进方向：**上面的内容都是基于论文内容的客观陈述，接下来是个人主观分析，请读者持批判态度阅读。</p>
+<p class="component-content component">分析基于个人掌握的知识，从本文出发，对3D检测技术的演进方向进行主观分析，因此称为“大话”。</p>
+<p class="component-content component">但是后续我会进行独立实验及相关的研究跟踪，预知后续发展请保持关注。</p>
+<p class="component-content component">话不多说，上菜：</p>
+<div class="component-content component"><ul>
+<li>特征提取和聚合方式的改进：TED在3D卷积部分对所有变换使用共享权重，这点与多模型TTA+ensemble机制等效。但是BEV特征聚合时候，只是简单使用双线性插值和max-pooling方式聚合多种变换的特征，这种方式过于简单，效果也有限。此外，TiVoxelPooling同时使用了VSA和cross-attention，可能过于复杂，后续可以尝试寻求更简单有效的目标级特征聚合方式。</li>
+<li>对数据增强方式进行演进：当前只用了旋转、反射和近距离目标点云下采样，后续可以考虑其他增强方式。</li>
+<li>将TED的前增强机制应用于其他检测框架：将此数据增强方式应用于LoGoNet那样的局部特征对齐框架，实现局部+等效变化结合的特征对齐和特征聚合方式。或者应用于SFD/VirConv/GLENet那样的虚拟点云生成框架，通过虚拟点云+数据增强提高检测模型的鲁棒性和检测精度。或者将前增强机制与MPPNet那样的序列检测机制结合，以增强数据+序列数据来提取更丰富的特征，从而提高检测指标。</li>
+</ul></div>
+
+          </div>
+          
+          <div class="component">
+            <div class="component-content">
+              <div class="article-copyright">
+                <p class="content">
+                  Copyright: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed" target="_blank">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</a>
+                </p>
+                <p class="content">Author:  jk049 </p>
+                <p class="content">Posted on:  May 8, 2023</p>
+              </div>
+            </div>
+          </div>
+          
+        </article>
+      </section>
+  </main>
+
+  <script>
+    var script = document.createElement("script");script.src = "https://jk049.github.io/js/initPost.js";
+    document.head.appendChild(script);
+  </script>
+
+    
+    <div class="footer-main ">
+  <div class="content-body footer-wraper">
+    <div class="footer-box">
+      <div class="foot-nav">
+        <div class="foot-nav-items">
+          <div class="item">
+            <div class="logo"></div>
+            <div class="email">Email: <a href="mailto:jk049jk@gmail.com">jk049jk@gmail.com</a></div>
+          </div>
+
+          <div class="item community">
+            <div class="item-title">Social Media</div>
+            
+              <a href="https://github.com/floyd-li" target="_blank">Github</a>
+            
+              <a href="https://twitter.com/some-one" target="_blank">Twitter</a>
+            
+          </div>
+
+          <div class="item resources">
+            <div class="item-title">Related</div>
+            
+              <a href="https://yufengbiji.com/" target="_blank">驭风笔记</a>
+            
+              <a href="https://apple.com/" target="_blank">Apple</a>
+            
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="item copyright">
+          &copy; 2023
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> & <a href="https://github.com/floyd-li/hugo-theme-itheme" target="_blank">iTheme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+    
+    
+
+    
+    
+</html>

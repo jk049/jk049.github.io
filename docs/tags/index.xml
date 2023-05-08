@@ -7,13 +7,31 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>jk049</copyright>
-    <lastBuildDate>Sat, 06 May 2023 16:49:18 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 08 May 2023 13:24:27 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>3D</title>
       <link>https://jk049.github.io/tags/3d/</link>
-      <pubDate>Sat, 06 May 2023 16:49:18 +0800</pubDate>
+      <pubDate>Mon, 08 May 2023 13:24:27 +0800</pubDate>
       
       <guid>https://jk049.github.io/tags/3d/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>LiDAR</title>
+      <link>https://jk049.github.io/tags/lidar/</link>
+      <pubDate>Mon, 08 May 2023 13:24:27 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/tags/lidar/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>数据增强</title>
+      <link>https://jk049.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/</link>
+      <pubDate>Mon, 08 May 2023 13:24:27 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/</guid>
       <description></description>
     </item>
     
@@ -32,15 +50,6 @@
       <pubDate>Sat, 06 May 2023 16:49:18 +0800</pubDate>
       
       <guid>https://jk049.github.io/tags/%E8%99%9A%E6%8B%9F%E7%82%B9%E4%BA%91/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Lidar</title>
-      <link>https://jk049.github.io/tags/lidar/</link>
-      <pubDate>Fri, 05 May 2023 20:02:57 +0800</pubDate>
-      
-      <guid>https://jk049.github.io/tags/lidar/</guid>
       <description></description>
     </item>
     

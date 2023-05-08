@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>jk049</copyright>
-    <lastBuildDate>Sat, 06 May 2023 16:49:18 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/3d/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 08 May 2023 13:24:27 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/3d/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>3D检测论文解读——TED</title>
+      <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBted/</link>
+      <pubDate>Mon, 08 May 2023 13:24:27 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBted/</guid>
+      <description>一句话总结 厦门大学王程团队与赢彻科技杨睿刚团队合作发表于2022.11，主要创新点是将TTA的数据增强机制前移，并对特征提取和特征聚合模块做</description>
+    </item>
+    
     <item>
       <title>3D检测论文解读——SFD</title>
       <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBsfd/</link>

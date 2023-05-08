@@ -15,6 +15,8 @@ theme: "light"
 
 实验结果还行，在KITTI 验证集上对car moderate的检测精度达85.28, WOD上没什么竞争力。3090上推理速度11fps，显存消耗翻倍。
 
+![屏幕截图 2022-10-18 175341](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/屏幕截图 2022-10-18 175341.png)
+
 # 摘要
 
 **背景**：3D检测对自动驾驶很重要，之前的检测方法没有考虑航向变化和放射变换(variations of rotation and reflection transformations)，因此需要大网络和数据增强来提高鲁棒性。 最近的**equivariant network**对点云进行多重变换，然后使用共享网络来对变换进行建模，显示出对目标几何结构建模的强大潜力。 但是Equivariant network很难直接应用到点云3D检测任务上，因为其计算量很大，推理速度很慢。

@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>jk049</copyright>
-    <lastBuildDate>Mon, 08 May 2023 13:24:27 +0800</lastBuildDate><atom:link href="https://jk049.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 17 May 2023 18:25:54 +0800</lastBuildDate><atom:link href="https://jk049.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>3D检测论文解读——PillarNext</title>
+      <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnext/</link>
+      <pubDate>Wed, 17 May 2023 18:25:54 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnext/</guid>
+      <description>一句话总结 这篇文章想要颠覆已有点云3D检测框架，提出了新的基于pillar形式的点云3D检测框架，而且作者指明后续演进方向是将2D检测的优秀</description>
+    </item>
+    
     <item>
       <title>3D检测论文解读——TED</title>
       <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBted/</link>

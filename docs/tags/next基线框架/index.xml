@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>next基线框架 on jk049&#39;s blog</title>
+    <link>https://jk049.github.io/tags/next%E5%9F%BA%E7%BA%BF%E6%A1%86%E6%9E%B6/</link>
+    <description>Recent content in next基线框架 on jk049&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>jk049</copyright>
+    <lastBuildDate>Wed, 17 May 2023 18:25:54 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/next%E5%9F%BA%E7%BA%BF%E6%A1%86%E6%9E%B6/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>3D检测论文解读——PillarNext</title>
+      <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnext/</link>
+      <pubDate>Wed, 17 May 2023 18:25:54 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnext/</guid>
+      <description>一句话总结 这篇文章想要颠覆已有点云3D检测框架，提出了新的基于pillar形式的点云3D检测框架，而且作者指明后续演进方向是将2D检测的优秀</description>
+    </item>
+    
+  </channel>
+</rss>

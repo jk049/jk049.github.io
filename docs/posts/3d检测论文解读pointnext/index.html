@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html class="js no-touch  progressive-image  no-reduced-motion progressive" lang="en">
+  <head>
+    <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="/img/favicon.ico">
+
+    <meta name="keyword" content="">
+
+    <title>3D检测论文解读——PointNext</title>
+
+    <link rel="canonical" href="/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpointnext/">
+
+    <link rel="stylesheet" href="/css/global.css">
+
+    <link rel="stylesheet" href="/css/custom.css">
+
+    <link rel="stylesheet" href="/css/search.css" />
+
+    
+    
+
+    
+    
+
+</head>
+  </head>
+  <body class=" page-article   ">
+    <header>
+      <nav class="nav">
+  <div class="nav-wrapper">
+    <div class="nav-content-wrapper">
+      <div class="nav-content">
+        <a href="/ " class="nav-title">jk049&#39;s blog</a>
+        <div class="nav-menu">
+          <div class="nav-item-wrapper">
+            <a href="/posts " class="nav-item-content">Articles</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/about" class="nav-item-content">About</a>
+          </div>
+          <div class="nav-item-wrapper">
+            <a href="/index.xml" class="nav-item-content" target="_blank">RSS</a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleSearchModal(){
+    const template = `
+    <div class="modal-body">
+      <div id="autocomplete" onclick="event.stopPropagation();"></div>
+    </div>
+    `
+    const modal = document.querySelector("#modal-wrapper")
+    if(!modal){
+      const div = document.createElement("div")
+      document.body.setAttribute("style","overflow: hidden;")
+      div.setAttribute("id", "modal-wrapper")
+      div.setAttribute("onclick", "toggleSearchModal()")
+      div.innerHTML = template
+      const script = document.createElement("script");script.setAttribute("src", "https://jk049.github.io/js/algolia.js")
+      div.appendChild(script)
+      document.body.append(div)
+    } else {
+      document.body.removeAttribute("style")
+      document.body.removeChild(modal)
+    }
+  }
+</script>
+    </header>
+    
+  
+  
+  <main id="main" class="main">
+      <section>
+        <article class="article">
+          
+          <div class=" article-header ">
+            <div class="category component">
+              <div class="component-content">
+                <div class="category-eyebrow">
+                  <span class="category-eyebrow__category category_original">
+                    
+                      
+                        PointNext
+                      
+                    
+                  </span>
+                  <span class="category-eyebrow__date">May 19, 2023</span>
+                </div>
+              </div>
+            </div>
+            <div class="pagetitle component">
+              <div class="component-content">
+                <h1 class="hero-headline">3D检测论文解读——PointNext</h1>
+              </div>
+            </div>
+            <div class="component  article-subhead ">
+              <div class="component-content">PointNet&#43;&#43;老树发新芽，我们且看它能否焕发第二春~</div>
+            </div>
+
+            <div class="tagssheet component">
+              <div class="component-content">
+                
+                  
+                  <a href="/tags/pointnext" class="tag">
+                    PointNext
+                  </a>
+                
+                  
+                  <a href="/tags/3d" class="tag">
+                    3D
+                  </a>
+                
+                  
+                  <a href="/tags/point" class="tag">
+                    point
+                  </a>
+                
+              </div>
+            </div>
+          </div>
+          
+          <div class="pagebody">
+            
+            
+            
+            
+            
+            
+            
+            
+            
+<div class="component-content pagebody component">
+  <h1 id="一句话总结" class="pagebody-header">
+    一句话总结
+  </h1>
+</div><p class="component-content component">该文章是阿卜杜拉国王科技大学的Bernard Ghanem和钱国成团队提出的，Bernard大佬之前提出过点云3D检测框架PointRGCN。个人认为，该团队对PointNet系列框架的理解是比较深刻的，他们的观点值得我们去认真审视。</p>
+<p class="component-content component">这篇文章的主要观点是认为PointNet++的潜力还没被完全挖掘出来，因此从两方面进行优化：</p>
+<div class="component-content component"><ul>
+<li>应用先进的训练策略，比如AdamW优化器、交叉熵损失函数、数据增强技术等；</li>
+<li>改进PointNet++框架，提出Inverted Residual MLP和感受野扩张技术；</li>
+</ul></div>
+<p class="component-content component">该框架在语义分割和目标分类数据集上进行了验证，但是从理论上讲，在3D检测数据集上应该也有提升。</p>
+<p class="component-content component">总的来说，这篇文章应该称为PointNet plus pro，而不是“next”。因为是基于PointNet++的演进，并没有完全替换或大规模改动PointNet++的结构。此外，该文章对PointNet++各种组件及参数进行了详细的分析，不论对框架的改动是否有效果，这些验证分析工作也是很有价值的、值得我们思考的成果。</p>
+<p class="component-content component">anyway, 这篇文章为我们打开了PointNet系列的演进思路，值得我们进一步尝试。</p>
+
+<div class="component-content pagebody component">
+  <h1 id="摘要" class="pagebody-header">
+    摘要
+  </h1>
+</div><p class="component-content component"><strong>背景</strong>：PointNet++是一个很有影响力的点云3D检测框架。虽然其检测精度远低于最近的PointMLP、PointTransformer等框架，但是作者团队发现，这些模型的精度提升大都因为训练策略的改进，包括数据增强、优化技术、模型规模等，而不是因为架构上的创新。</p>
+<p class="component-content component"><strong>该团队的研究成果</strong>：该团队认为：PointNet++的潜力还没有被完全挖掘。于是，该团队重新审视了PointNet++网络，系统性研究了模型训练和scaling策略，然后产生两个研究成果：</p>
+<div class="component-content component"><ul>
+<li>训练策略优化：提出一些列改进的训练策略，大大提高了检测精度，AP能提高9个点左右；</li>
+<li>提出PointNext模型：基于PointNet++, 提出inverted residual bottleneck和separable MLP设计，使得model scaling更高效更有效；</li>
+</ul></div>
+<p class="component-content component"><strong>实验结果</strong>：</p>
+<div class="component-content component"><ul>
+<li>在分类数据集ScanObjectNN上SOTA，比PointMLP推理速度快10倍；</li>
+<li>在语义分割数据集S3DIS上SOTA，精度超过PointTransformer;</li>
+</ul></div>
+<p class="component-content component">代码仓：https://github.com/guochengqian/pointnext</p>
+
+<div class="component-content pagebody component">
+  <h1 id="基本介绍" class="pagebody-header">
+    基本介绍
+  </h1>
+</div><p class="component-content component">PointNet和PointNet++系列是最先直接处理点云的框架，之后演进出KPConv和PointTransformer，并且效果大幅提高。这给人一种错觉，即PointNet系列太简单，不足以学习复杂的点云特征。 该团队重新审视了PointNet++，发现该经典框架的潜力还没被完全挖掘出来，后期文章的提升主要因为训练策略和model scaling策略。已这些优秀的训练策略重新训练PointNet++，提升巨大。具体效果见下图：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-294d127d3da6bb65a401b73b659e88d2" id="lht294d127d3da6bb65a401b73b659e88d2">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230519170013699.png" alt="image-20230519170013699"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230519170013699
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+
+<div class="component-content pagebody component">
+  <h1 id="pointnet-review" class="pagebody-header">
+    PointNet++ Review
+  </h1>
+</div><p class="component-content component">PointNet++整体架构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-9d289fcbba5c9746715b4da92b793759" id="lht9d289fcbba5c9746715b4da92b793759">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230519170033512.png" alt="image-20230519170033512"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230519170033512
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">其中encoder模块由一系列set abstraction模块构成；decoder模块由一系列特征聚合模块组成。 Set Abstration模块包含以下几个组件：</p>
+<div class="component-content component"><ul>
+<li>下采样层：对输入点云进行下采样；</li>
+<li>grouping层：负责领域点云查询；</li>
+<li>共享MLP：用于特征提取；</li>
+<li>reduction层：负责领域特征聚合；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h1 id="pointnext设计细节" class="pagebody-header">
+    PointNext设计细节
+  </h1>
+</div><p class="component-content component">PointNext是基于PointNet++的演进设计，主要创新点包括两方面：训练策略优化和架构优化。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="训练策略优化" class="pagebody-header">
+    训练策略优化
+  </h2>
+</div><p class="component-content component">该团队进行了数据增强和优化技术发面的系统研究，进而量化各个技术的效果。</p>
+<p class="component-content component"><strong>数据增强</strong>：原始的PointNet++使用的数据增强方法是随机旋转、缩放、变换和抖动。最近有更强的数据增强方法，比如KPConv里的randomly drops colors，Point BERT里的点云重采样策略。PointNext团队对各种数据增强方法进行了专门的量化效果研究。具体实验过程如下：</p>
+<div class="component-content component"><ol>
+<li>原始PointNet++为基线：基线版本采用PointNet++原始的数据增强方式；</li>
+<li>控制变量验证效果：依次移除每种数据增强方式，验证其是否有效；</li>
+<li>去伪存真：移除没用的数据增强方式，保留有用的；</li>
+<li>验证其他框架种采用的典型数据增强技术：包括点云重采样、随机噪声、height appending、全场景输入、color drop、color auto contrast等。</li>
+</ol></div>
+<p class="component-content component">实验数据如下：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-96aeda02ad3f044aee53a1bf91c5960b" id="lht96aeda02ad3f044aee53a1bf91c5960b">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230519170114194.png" alt="image-20230519170114194"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230519170114194
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component"><strong>优化技术</strong> 优化技术包括损失函数、优化器、学习率调度器(learning rate schedulers)、超参数。 对于上述几个优化技术，PointNet++使用的有：交叉熵损失函数、Adam优化器、exponential learning rate decay。 受益于机器学习理论的发展，现在的神经网络可以用更好的优化器，比如AdamW；还有更高级的损失函数，比如CrossEntropy with label smoothing。 与数据增强的验证方式一样，该团队也对各优化技术进行了控制变量实验，具体流程如下：</p>
+<div class="component-content component"><ol>
+<li>超参搜索：查找最优的学习率和weight decay的超参；</li>
+<li>研究label smoothing、优化器、学习率调度器的最优组合；</li>
+</ol></div>
+<p class="component-content component">实验结论是：CrossEntropy with label smoothing， AdamW, Cosine Decay在大部分场景下都表现优秀。</p>
+
+<div class="component-content pagebody component">
+  <h2 id="架构优化" class="pagebody-header">
+    架构优化
+  </h2>
+</div><p class="component-content component">基于PointNet++框架演进，提出PointNext。该框架的主要改动包含两个方面：感受野扩张(receptive field scaling)和模型扩张(model scaling)。</p>
+<p class="component-content component"><strong>感受野扩张</strong>：感受野是神经网络中非常重要的一个角色，点云中至少有两种方式可以增加感受野：</p>
+<div class="component-content component"><ul>
+<li>增加邻域查询半径；</li>
+<li>采用层级架构：该方式已在原始PointNet++架构中使用；PointNet++的感受野半径设置很大程度上基于直觉，即当对点云进行下采样时，感受野半径翻倍。该团队测试了不同的感受野半径，然后发现不同数据集下最优感受野半径不同，但不论什么数据集，感受野半径对检测精度的影响都很大。具体细节信息如下：
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-113fdce5a89f7c7ca4d40a843d7ee68c" id="lht113fdce5a89f7c7ca4d40a843d7ee68c">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230519170136526.png" alt="image-20230519170136526"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230519170136526
+      </div>
+    </div>
+  </div>
+</figure>
+</li>
+</ul></div>
+<p class="component-content component">此外，该团队还发现邻域查询时，相对坐标距离导致优化困难，进而影响检测指标。因此，该团队对相对位置进行归一化处理，降低了优化难度。 这个问题的主要原因是：weight decay时会降低网络的权重，相当于降低了相对位置的影响。而归一化降级了相对距离的方差，对相对距离的分布进行了重排，进而降低了weight decay的影响。</p>
+<p class="component-content component">【注】感觉这块的逻辑没说清。</p>
+<p class="component-content component"><strong>模型扩张</strong>：PointNet++模型很简单，参数量在百万级别，远小于其他模型。该团队发现无论是增加更多SA模块还是增加更多通道，都会导致梯度消失和过拟合，不能提高精度。进一步分析之后，该团队提出Inverted Residual MLP模块，级联在SA模块之后，被证明能有效实现model scaling。InvResMLP是基于SA模块的优化，与SA主要有3个不同点：</p>
+<div class="component-content component"><ul>
+<li>输入输出见的残差连接：用于减轻梯度消失问题；</li>
+<li>Separable MLP：用于降低计算量、增强点云特征提取，该设计受MobileNet和ASSANet的启发；</li>
+<li>Inverted bottleneck：增加输出通道，提取更丰富的特征；</li>
+</ul></div>
+
+<div class="component-content pagebody component">
+  <h1 id="实验结果" class="pagebody-header">
+    实验结果
+  </h1>
+</div><p class="component-content component">在数据集S3DIS/ScanNet/ShapeNetPart上测试语义分割，在ScanObjectNN/ModelNet40上测试目标分类。</p>
+<p class="component-content component"><strong>训练细节</strong>：label smoothing CrossEntropy损失函数、AdamW优化器、初始学习率0.001、weight decay 0.0001、batch size为32。训练硬件为V100 32G单卡。验证集上最好的模型用于测试集测试。 具体指标这里就不放了，笔者当前只关注目标检测领域。</p>
+<p class="component-content component"><strong>消融实验</strong>：如下表所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-9a0d972b32d2696da17c621748fe6b7d" id="lht9a0d972b32d2696da17c621748fe6b7d">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230519170200093.png" alt="image-20230519170200093"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230519170200093
+      </div>
+    </div>
+  </div>
+</figure>
+个人分析与总结</p>
+<p class="component-content component"><strong>作者信息</strong>：阿卜杜拉国王科技大学的Bernard Ghanem和钱国成团队，值得注意的是PointRGCN也是由Bernard团队提出的，可以说是专注Point框架30年~</p>
+<p class="component-content component"><strong>创新点</strong>：包括两方面：</p>
+<div class="component-content component"><ul>
+<li>以先进的训练技术重新训练PointNet++;</li>
+<li>基于PointNet++框架做模块级演进；</li>
+</ul></div>
+<p class="component-content component">总的来说，证明了PointNet++仍然很强，值得进一步研究和演进，该框架还没到天花板。</p>
+<p class="component-content component"><strong>大话演进方向</strong>：</p>
+<p class="component-content component">上面的内容都是基于论文内容的客观陈述，接下来是个人主观分析，请读者持批判态度阅读。</p>
+<p class="component-content component">分析基于个人掌握的知识，从本文出发，对3D检测技术的演进方向进行主观分析，因此称为“大话”。</p>
+<p class="component-content component">但是后续我会进行独立实验及相关的研究跟踪，预知后续发展请保持关注。</p>
+<p class="component-content component">话不多说，上菜：</p>
+<div class="component-content component"><ul>
+<li>
+<p class="component-content component">适配其他数据增强方式：数据增强已经是检测领域的重要技术，是否有更适合点云的数据增强技术？对点云3D检测任务来说，哪些数据增强方式是有效的。相信像该文章的分析方式针对3D检测任务分析之后，会进一步提高多种检测框架的指标；</p>
+</li>
+<li>
+<p class="component-content component">适配其他先进训练技术：该文章用AdamW替代Adam，是否还有其他优化器的效果能达到更好？2D检测领域使用的先进优化器有哪些，将那些优化器移植到3D检测场景，也许会有进一步的提高；</p>
+</li>
+<li>
+<p class="component-content component">适配其他感受野扩张技术：同是”next“辈框架的PillarNext认为只要简单的下采样就可以提供足够的感受野，而head的上采样又可以恢复出足够的细粒度几何信息。PointNext是否可以用这种感受野扩张技术？是否还有其他有效的感受野扩张技术？经过系统的对比分析后，可能会寻找出更适合点云框架的感受野增强技术；</p>
+</li>
+</ul></div>
+
+          </div>
+          
+          <div class="component">
+            <div class="component-content">
+              <div class="article-copyright">
+                <p class="content">
+                  Copyright: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed" target="_blank">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</a>
+                </p>
+                <p class="content">Author:  jk049 </p>
+                <p class="content">Posted on:  May 19, 2023</p>
+              </div>
+            </div>
+          </div>
+          
+        </article>
+      </section>
+  </main>
+
+  <script>
+    var script = document.createElement("script");script.src = "https://jk049.github.io/js/initPost.js";
+    document.head.appendChild(script);
+  </script>
+
+    
+    <div class="footer-main ">
+  <div class="content-body footer-wraper">
+    <div class="footer-box">
+      <div class="foot-nav">
+        <div class="foot-nav-items">
+          <div class="item">
+            <div class="logo"></div>
+            <div class="email">Email: <a href="mailto:jk049jk@gmail.com">jk049jk@gmail.com</a></div>
+          </div>
+
+          <div class="item community">
+            <div class="item-title">Social Media</div>
+            
+              <a href="https://github.com/floyd-li" target="_blank">Github</a>
+            
+              <a href="https://twitter.com/some-one" target="_blank">Twitter</a>
+            
+          </div>
+
+          <div class="item resources">
+            <div class="item-title">Related</div>
+            
+              <a href="https://yufengbiji.com/" target="_blank">驭风笔记</a>
+            
+              <a href="https://apple.com/" target="_blank">Apple</a>
+            
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="item copyright">
+          &copy; 2023
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> & <a href="https://github.com/floyd-li/hugo-theme-itheme" target="_blank">iTheme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+    
+    
+
+    
+    
+</html>

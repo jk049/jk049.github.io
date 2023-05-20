@@ -168,7 +168,31 @@
 <p class="component-content component">【注】这已经不是最近了吧？这个信息滞后有点多哦。。。</p>
 <p class="component-content component">该文的设计团队将上述基于pillar、voxel、range的设计统称为局部点云聚合方法，因为这些方法采用各种技术对点云在特定邻域内进行特征聚合。 该团队还认为：当前的点云3D检测算法的演进都是提出各种算子，而对检测框架的演进几乎停滞。大多数算法还是基于SECOND结构或PointPillars结构，在这方面缺乏新的设计。</p>
 <p class="component-content component"><strong>2D检测领域的进展</strong>：与3D检测相比，2D检测领域取得极大进展，这些进展归因于架构和训练技术的演进。2D检测的优秀BackBone有ResNet、SwinTransformers，高效的neck有BiFPN、YOLOF，训练方法有bag of freebies。</p>
-<p class="component-content component"><strong>PillarNext的设计思路</strong>：鉴于以上阐述，PillarNext团队认为应该重新审视点云3D检测应该聚焦于哪个点。具体来说，要重新审视局部点云特征聚合和整体架构两个方面：</p>
+<p class="component-content component"><strong>PillarNext的设计思路</strong>：鉴于以上阐述，PillarNext团队认为应该重新审视点云3D检测应该聚焦于哪个点。具体来说，要重新审视局部点云特征聚合和整体架构两个方面：
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-796745a15298d667955eab39307f6828" id="lht796745a15298d667955eab39307f6828">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://cdn2.unrealengine.com/mocap-shoot-fall-00205c43b83c.gif?resize=1&amp;w=1920" alt="动态展示"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        动态展示
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
 <div class="component-content component"><ul>
 <li>
 <p class="component-content component">对局部特征聚合模块的分析：首先，团队从计算资源的角度对局部点云特征聚合进行了比较。细粒度的特征聚合往往比粗粒度的聚合消耗更多计算资源。举例来说：基于voxel的聚合模块采用3D卷积的方式，比2D卷积运行更慢、需要的网络参数更多。这引出一个问题：我们应该如何分配资源？下图是各方法在计算资源与检测效果方面的比较：

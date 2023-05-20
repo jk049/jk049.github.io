@@ -37,7 +37,7 @@ theme: "light"
 
 **2D检测领域的进展**：与3D检测相比，2D检测领域取得极大进展，这些进展归因于架构和训练技术的演进。2D检测的优秀BackBone有ResNet、SwinTransformers，高效的neck有BiFPN、YOLOF，训练方法有bag of freebies。 
 
-**PillarNext的设计思路**：鉴于以上阐述，PillarNext团队认为应该重新审视点云3D检测应该聚焦于哪个点。具体来说，要重新审视局部点云特征聚合和整体架构两个方面：
+**PillarNext的设计思路**：鉴于以上阐述，PillarNext团队认为应该重新审视点云3D检测应该聚焦于哪个点。具体来说，要重新审视局部点云特征聚合和整体架构两个方面：![动态展示](https://cdn2.unrealengine.com/mocap-shoot-fall-00205c43b83c.gif?resize=1&w=1920)
 
 - 对局部特征聚合模块的分析：首先，团队从计算资源的角度对局部点云特征聚合进行了比较。细粒度的特征聚合往往比粗粒度的聚合消耗更多计算资源。举例来说：基于voxel的聚合模块采用3D卷积的方式，比2D卷积运行更慢、需要的网络参数更多。这引出一个问题：我们应该如何分配资源？下图是各方法在计算资源与检测效果方面的比较：![资源消耗与检测指标的关系](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230518111906451.png)由图中可知：基于pillar的方法比基于voxel和多角度融合的方法的表现都好。这一现象相当于对3D检测框架中细粒度的局部聚合的必要性提出质疑。 该团队认为：他们的这一发现与PointNext、A Closer Look at Local Aggregation Operators in Point Cloud Analysis的分析一致，这两篇文章认为各种局部特征聚合的效果都差不多，整体框架的影响力更大一些。
 

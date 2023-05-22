@@ -85,10 +85,10 @@ FPN结构中的neck模块的作用是：将高维度的语义特征与低维度�
 
 话不多说，上菜：
 
-- 其他2D BackBone: 是否可以用其他的2D优秀BackBone来进行pillar特征编码？只要把2D传统CNN改为2D稀疏CNN，这方面可以进行进一步的尝试；
+- 其他2D BackBone:是否可以用其他的2D优秀BackBone来进行pillar特征编码？只要把2D传统CNN改为2D稀疏CNN，这方面可以进行进一步的尝试；
 
-- 其他2D Neck的替换：是否可以用2D检测领域的其他neck替换pillar框架的neck？
+- 其他2D Neck的替换:是否可以用2D检测领域的其他neck替换pillar框架的neck？
 
-- 移植先进训练技术：另一个“next”辈的点云3D框架PointNext的一大重要贡献就是将先进的训练技术应用于之前的经典框架PointNet++，从而大大提高了检测精度。pillar系列的next是否也可以用这些先进的训练技术来老树发新芽？
+- 移植先进训练技术另一个“next”辈的点云3D框架PointNext的一大重要贡献就是将先进的训练技术应用于之前的经典框架PointNet++，从而大大提高了检测精度。pillar系列的next是否也可以用这些先进的训练技术来老树发新芽？
 
   

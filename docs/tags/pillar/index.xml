@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>jk049</copyright>
-    <lastBuildDate>Wed, 17 May 2023 18:25:54 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/pillar/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 22 May 2023 15:38:25 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/pillar/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>3D检测论文解读——PillarNet</title>
+      <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnet/</link>
+      <pubDate>Mon, 22 May 2023 15:38:25 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnet/</guid>
+      <description>一句话总结 PillarNet是上交马超团队于2022年5月发表的一篇基于pillar的点云3D检测算法，马超团队近年来一直在零星发表3D检测</description>
+    </item>
+    
     <item>
       <title>3D检测论文解读——PillarNext</title>
       <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnext/</link>

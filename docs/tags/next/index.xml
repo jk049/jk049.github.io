@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>jk049</copyright>
-    <lastBuildDate>Mon, 22 May 2023 15:38:25 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/next/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 24 May 2023 21:43:11 +0800</lastBuildDate><atom:link href="https://jk049.github.io/tags/next/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>下一代点云3D检测基线框架三带一：PointNext、VoxelNext、PillarNext和PillarNet解读与分析</title>
+      <link>https://jk049.github.io/posts/%E4%B8%8B%E4%B8%80%E4%BB%A3%E7%82%B9%E4%BA%913d%E6%A3%80%E6%B5%8B%E5%9F%BA%E7%BA%BF%E6%A1%86%E6%9E%B6%E4%B8%89%E5%B8%A6%E4%B8%80pointnextvoxelnextpillarnext%E5%92%8Cpillarnet%E8%A7%A3%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/</link>
+      <pubDate>Wed, 24 May 2023 21:43:11 +0800</pubDate>
+      
+      <guid>https://jk049.github.io/posts/%E4%B8%8B%E4%B8%80%E4%BB%A3%E7%82%B9%E4%BA%913d%E6%A3%80%E6%B5%8B%E5%9F%BA%E7%BA%BF%E6%A1%86%E6%9E%B6%E4%B8%89%E5%B8%A6%E4%B8%80pointnextvoxelnextpillarnext%E5%92%8Cpillarnet%E8%A7%A3%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/</guid>
+      <description>一句话总结 本文对4个典型的&amp;quot;下一代&amp;quot;点云3D检测基线框架(PointNext/VoxelNext/PillarNext/</description>
+    </item>
+    
     <item>
       <title>3D检测论文解读——PillarNet</title>
       <link>https://jk049.github.io/posts/3d%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E8%A7%A3%E8%AF%BBpillarnet/</link>

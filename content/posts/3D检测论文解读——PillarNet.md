@@ -13,7 +13,7 @@ theme: "light"
 
 PillarNet是上交马超团队于2022年5月发表的一篇基于pillar的点云3D检测算法，马超团队近年来一直在零星发表3D检测相关文章，比较知名的是LC融合3D检测方法PointAugmenting。
 
-该文章主要创新点是将pillar特征编码有MLP由PointNet方法改为2D稀疏卷积方法，对Neck引入特征聚合机制，对head进行了小改动。
+该文章主要创新点是将pillar特征编码由PointNet的MLP方法改为2D稀疏卷积方法，对Neck引入特征聚合机制，对head进行了小改动。
 
 有意思的是：QCraft的杨晓东团队在一年后发表的类似的文章PillarNext，与PillarNet不同的是其Pillar编码使用的是基于稀疏卷积的ResNet18，Neck采用2D检测领域的优秀Neck设计ASPP。相当于都是对pillar特征编码和neck做改动，其中pillar编码都是使用2D稀疏卷积实现，只是具体实现方式不同。
 
@@ -56,11 +56,29 @@ SECOND、PointPillars、PillarNet结构对比如下图所示：
 
 特征编码模块采用4层2D稀疏卷积，下采样倍数分别为1、2、4、8。这种设计可以使用图像领域广泛应用的VGGNet/ResNet等结构，同时下采样设计可以提供不同pillar尺寸的特征。
 
+具体的2D BackBone结构如下图所示：
+
+![image-20230612170052637](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230612170052637.png)
+
+可见此处的2D BackBone设计参考了VoxelRCNN系列的3D BackBone结构，都在每个卷积模块开始时用SparseConv控制特征扩散范围，同时整体BackBone的卷积模块数量控制在4-5个。
+
+为读者更直观更方便地对比，将VoxelRCNN系列的3D BackBone结构图附在下面：
+
+![image-20230612165705265](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230612165705265.png)
+
+其中，3D BackBone分为两种，一种是没有残差结构的BackBone，另一种是有残差连接的BackBone。上图是没有残差的BackBone，此处只为了对比Voxel系列和PillarNet BackBone的结构相似性，因此忽略残差结构等细节。
+
+
+
 ## Neck设计
 
 FPN结构中的neck模块的作用是：将高维度的语义特征与低维度的空间特征进行融合，进而将融合特征输入給head。 PillarNet基于SECOND的Neck提出两种neck设计，如 下图所示：
 
 ![image-20230522153600230](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230522153600230.png)
+
+从代码的角度，neckV2的结构如下图所示：
+
+![image-20230612191247780](https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230612191247780.png)
 
 # 实验结果
 
@@ -85,11 +103,13 @@ FPN结构中的neck模块的作用是：将高维度的语义特征与低维度�
 
 话不多说，上菜：
 
-- 其他2D BackBone, 是否可以用其他的2D优秀BackBone来进行pillar特征编码？只要把2D传统CNN改为2D稀疏CNN，这方面可以进行进一步的尝试；
-- 其他2D Neck的替换:是否可以用2D检测领域的其他neck替换pillar框架的neck？
-- 移植先进训练技术 另一个“next”辈的点云3D框架PointNext的一大重要贡献就是将先进的训练技术应用于之前的经典框架PointNet++，从而大大提高了检测精度。pillar系列的next是否也可以用这些先进的训练技术来老树发新芽？
+- 其他2D BackBone: 是否可以用其他的2D优秀BackBone来进行pillar特征编码？只要把2D传统CNN改为2D稀疏CNN，这方面可以进行进一步的尝试；
 
+- 其他2D Neck的替换：是否可以用2D检测领域的其他neck替换pillar框架的neck？
 
+- 移植先进训练技术：另一个“next”辈的点云3D框架PointNext的一大重要贡献就是将先进的训练技术应用于之前的经典框架PointNet++，从而大大提高了检测精度。pillar系列的next是否也可以用这些先进的训练技术来老树发新芽？
+
+  
 
 
 

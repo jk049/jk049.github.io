@@ -148,7 +148,7 @@
     一句话总结
   </h1>
 </div><p class="component-content component">PillarNet是上交马超团队于2022年5月发表的一篇基于pillar的点云3D检测算法，马超团队近年来一直在零星发表3D检测相关文章，比较知名的是LC融合3D检测方法PointAugmenting。</p>
-<p class="component-content component">该文章主要创新点是将pillar特征编码有MLP由PointNet方法改为2D稀疏卷积方法，对Neck引入特征聚合机制，对head进行了小改动。</p>
+<p class="component-content component">该文章主要创新点是将pillar特征编码由PointNet的MLP方法改为2D稀疏卷积方法，对Neck引入特征聚合机制，对head进行了小改动。</p>
 <p class="component-content component">有意思的是：QCraft的杨晓东团队在一年后发表的类似的文章PillarNext，与PillarNet不同的是其Pillar编码使用的是基于稀疏卷积的ResNet18，Neck采用2D检测领域的优秀Neck设计ASPP。相当于都是对pillar特征编码和neck做改动，其中pillar编码都是使用2D稀疏卷积实现，只是具体实现方式不同。</p>
 
 <div class="component-content pagebody component">
@@ -242,6 +242,60 @@
     PillarNet特征编码模块设计细节
   </h2>
 </div><p class="component-content component">特征编码模块采用4层2D稀疏卷积，下采样倍数分别为1、2、4、8。这种设计可以使用图像领域广泛应用的VGGNet/ResNet等结构，同时下采样设计可以提供不同pillar尺寸的特征。</p>
+<p class="component-content component">具体的2D BackBone结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-0b41cd7a12f6f4de014d2bc3ab5d4796" id="lht0b41cd7a12f6f4de014d2bc3ab5d4796">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230612170052637.png" alt="image-20230612170052637"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230612170052637
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">可见此处的2D BackBone设计参考了VoxelRCNN系列的3D BackBone结构，都在每个卷积模块开始时用SparseConv控制特征扩散范围，同时整体BackBone的卷积模块数量控制在4-5个。</p>
+<p class="component-content component">为读者更直观更方便地对比，将VoxelRCNN系列的3D BackBone结构图附在下面：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-64b498ccfbab5e100bf333ea1f4ef152" id="lht64b498ccfbab5e100bf333ea1f4ef152">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230612165705265.png" alt="image-20230612165705265"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230612165705265
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">其中，3D BackBone分为两种，一种是没有残差结构的BackBone，另一种是有残差连接的BackBone。上图是没有残差的BackBone，此处只为了对比Voxel系列和PillarNet BackBone的结构相似性，因此忽略残差结构等细节。</p>
 
 <div class="component-content pagebody component">
   <h2 id="neck设计" class="pagebody-header">
@@ -268,6 +322,32 @@
     <div class="image-description">
       <div class="image-caption">
         image-20230522153600230
+      </div>
+    </div>
+  </div>
+</figure>
+</p>
+<p class="component-content component">从代码的角度，neckV2的结构如下图所示：</p>
+<p class="component-content component">
+
+
+
+
+
+
+
+
+<figure class="image component image-fullbleed body-copy-wide nr-scroll-animation nr-scroll-animation--on image-big">  <div class="component-content">
+    <div class="image-sharesheet">
+      <div class="image image-load image-asset image-ee2619c4f0e9aaced8b6b3da288d23d9" id="lhtee2619c4f0e9aaced8b6b3da288d23d9">
+        <picture  class="picture">
+          <img class="picture-image" data-src="https://blog-pic-bkt.oss-ap-southeast-1.aliyuncs.com/img/image-20230612191247780.png" alt="image-20230612191247780"  />
+        </picture>
+      </div>
+    </div>
+    <div class="image-description">
+      <div class="image-caption">
+        image-20230612191247780
       </div>
     </div>
   </div>
@@ -368,9 +448,15 @@
 <p class="component-content component"><strong>大话演进方向</strong>：上面的内容都是基于论文内容的客观陈述，接下来是个人主观分析，请读者持辩证的态度阅读。分析基于个人掌握的知识，从本文出发，对3D检测技术的演进方向进行主观分析，因此称为“大话”。但是后续我会进行独立实验及相关的研究跟踪，预知后续分析请保持关注。</p>
 <p class="component-content component">话不多说，上菜：</p>
 <div class="component-content component"><ul>
-<li>其他2D BackBone, 是否可以用其他的2D优秀BackBone来进行pillar特征编码？只要把2D传统CNN改为2D稀疏CNN，这方面可以进行进一步的尝试；</li>
-<li>其他2D Neck的替换:是否可以用2D检测领域的其他neck替换pillar框架的neck？</li>
-<li>移植先进训练技术 另一个“next”辈的点云3D框架PointNext的一大重要贡献就是将先进的训练技术应用于之前的经典框架PointNet++，从而大大提高了检测精度。pillar系列的next是否也可以用这些先进的训练技术来老树发新芽？</li>
+<li>
+<p class="component-content component">其他2D BackBone: 是否可以用其他的2D优秀BackBone来进行pillar特征编码？只要把2D传统CNN改为2D稀疏CNN，这方面可以进行进一步的尝试；</p>
+</li>
+<li>
+<p class="component-content component">其他2D Neck的替换：是否可以用2D检测领域的其他neck替换pillar框架的neck？</p>
+</li>
+<li>
+<p class="component-content component">移植先进训练技术：另一个“next”辈的点云3D框架PointNext的一大重要贡献就是将先进的训练技术应用于之前的经典框架PointNet++，从而大大提高了检测精度。pillar系列的next是否也可以用这些先进的训练技术来老树发新芽？</p>
+</li>
 </ul></div>
 
           </div>
